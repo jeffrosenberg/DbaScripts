@@ -1,22 +1,24 @@
--- Database files (including OS volume details)
-SELECT [Table] = 'Database Files'
-SELECT f.database_id, database_name = DB_NAME(f.database_id)
-, [file_name] = f.name, f.file_id, f.type_desc, f.state_desc
-, drive = s.volume_mount_point, drive_name = s.logical_volume_name
-, file_path = f.physical_name
-, size_mb = CAST((f.size * 8.0 / 1024) AS decimal(10,2))
-, size_gb = CAST((f.size * 8.0 / 1024 / 1024) AS decimal(7,2))
-, growth = CASE
-            WHEN f.is_percent_growth = 1 
-              THEN CAST(growth AS varchar(3)) + '%'
-            ELSE CAST(growth * 8 / 1024 AS varchar(20)) + ' MB'
-            END
+-- Disk usage per drive (all drives)
+SELECT [Table] = 'Drives'
+EXEC sys.xp_fixeddrives
+
+-- Disk usage per drive (drives with databases)
+SELECT [Table] = 'Drives with databases'
+SELECT drive = s.volume_mount_point, drive_name = s.logical_volume_name
+, database_size_gb = CAST(SUM(f.size * 8.0 / 1024 / 1024) AS decimal(6,2))
+, total_space_gb = CAST(MAX(s.total_bytes / 1024.0 / 1024 / 1024) AS decimal(7,2))
+, available_space_gb = CAST(MAX(s.available_bytes / 1024.0 / 1024 / 1024) AS decimal(7,2))
+, available_space_pct = 
+    CAST(
+      MAX(s.available_bytes) / MAX(s.total_bytes * 1.0) * 100
+      AS decimal(6,2))
 FROM sys.master_files AS f
 CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id) AS s
-ORDER BY f.database_id, f.[type];
+GROUP BY s.volume_mount_point, s.logical_volume_name
+ORDER BY s.volume_mount_point;
 
 -- Disk usage per database
-SELECT [Table] = 'Disk Usage per Database'
+SELECT [Table] = 'Disk usage per database'
 SELECT database_id, database_name = DB_NAME(database_id)
 , data_size_mb = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size * 8.0 / 1024 END) AS decimal(10,2))
 , log_size_mb  = CAST(SUM(CASE WHEN type_desc = 'LOG'  THEN size * 8.0 / 1024 END) AS decimal(10,2))
@@ -40,26 +42,17 @@ SELECT database_id = 99999
 FROM sys.master_files
 ORDER BY database_id;
 
--- Disk usage per drive
-SELECT [Table] = 'Drives'
-SELECT drive = s.volume_mount_point, drive_name = s.logical_volume_name
-, database_size_gb = CAST(SUM(f.size * 8.0 / 1024 / 1024) AS decimal(6,2))
-, total_space_gb = CAST(MAX(s.total_bytes / 1024.0 / 1024 / 1024) AS decimal(7,2))
-, available_space_gb = CAST(MAX(s.available_bytes / 1024.0 / 1024 / 1024) AS decimal(7,2))
-, available_space_pct = 
-    CAST(
-      MAX(s.available_bytes) / MAX(s.total_bytes * 1.0) * 100
-      AS decimal(6,2))
-FROM sys.master_files AS f
-CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id) AS s
-GROUP BY s.volume_mount_point, s.logical_volume_name
-ORDER BY s.volume_mount_point;
-
 --Log usage
 SELECT [Table] = 'Log Usage'
 DBCC SQLPERF(LOGSPACE)
 
 --Allocated space -- applies only to current database
+/*
+SELECT [Table] = 'Internal Allocated/Unallocated Space'
+EXEC sp_spaceused;
+*/
+
+--Allocated space -- applies only to current database (the slow way)
 /*
 SELECT [Table] = 'Internal Allocated/Unallocated Space'
 SELECT f.database_id, database_name = DB_NAME(f.database_id)
@@ -93,3 +86,20 @@ GROUP BY f.database_id, f.type_desc, f.state_desc
 SELECT [Table] = 'Detailed Log Usage / VLFs'
 DBCC LOGINFO
 */
+
+-- Database files (including OS volume details)
+SELECT [Table] = 'Database files'
+SELECT f.database_id, database_name = DB_NAME(f.database_id)
+, [file_name] = f.name, f.file_id, f.type_desc, f.state_desc
+, drive = s.volume_mount_point, drive_name = s.logical_volume_name
+, file_path = f.physical_name
+, size_mb = CAST((f.size * 8.0 / 1024) AS decimal(10,2))
+, size_gb = CAST((f.size * 8.0 / 1024 / 1024) AS decimal(7,2))
+, growth = CASE
+            WHEN f.is_percent_growth = 1 
+              THEN CAST(growth AS varchar(3)) + '%'
+            ELSE CAST(growth * 8 / 1024 AS varchar(20)) + ' MB'
+            END
+FROM sys.master_files AS f
+CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id) AS s
+ORDER BY f.database_id, f.[type];

@@ -2,7 +2,7 @@
 --Source: http://blogs.msdn.com/b/carlnol/archive/2011/11/23/sql-server-query-performance-analysis-using-dmvs.aspx
 --===================================================================================
 
-SELECT TOP 20
+SELECT TOP 100
     total_worker_time, total_elapsed_time,
     total_worker_time/execution_count AS avg_cpu_cost, execution_count,
     (SELECT DB_NAME(dbid) + ISNULL('..' + OBJECT_NAME(objectid), '')

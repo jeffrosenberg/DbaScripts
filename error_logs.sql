@@ -1,0 +1,43 @@
+/*
+-------------------------------------------------------------------------------
+--Read SQL Logs
+-------------------------------------------------------------------------------
+
+Author: Jeff Rosenberg
+Date:   3/21/2016
+
+Based on the following script: https://www.mssqltips.com/sqlservertip/1476/reading-the-sql-server-log-files-using-tsql/
+*/
+
+-------------------------------------------------------------------------------
+--Fill in parameters here
+DECLARE 
+  @StartLogVersion tinyint     = 0    --0 = current, 1 = Archive #1, 2 = Archive #2, etc...
+, @EndLogVersion tinyint       = 1    --Get the current log and first archive by default; increase this to search more
+, @LogType      tinyint        = 1    --1 = error log, 2 = SQL Agent log
+, @SearchText1  nvarchar(2000) = N''  --Text string to search for
+, @SearchText2  nvarchar(2000) = N''  --Text string to further refine search results
+, @StartTime    datetime       = NULL --Get logs starting at this point
+, @EndTime      datetime       = NULL --Get logs ending at this point
+-------------------------------------------------------------------------------
+
+IF OBJECT_ID(N'tempdb..#Logs') IS NOT NULL  DROP TABLE #Logs;
+
+CREATE TABLE #Logs (
+  LogDate datetime,
+  ProcessInfo varchar(20),
+  [Text] varchar(4000)
+);
+
+--Read each log file into the temp table
+DECLARE @LogVersion tinyint = @StartLogVersion
+WHILE @LogVersion <= @EndLogVersion
+BEGIN
+  INSERT INTO #Logs
+  EXEC sys.xp_readerrorlog @LogVersion, @LogType, @SearchText1, @SearchText2, @StartTime, @EndTime;
+
+  SET @LogVersion += 1;
+END
+
+--Select the combined result
+SELECT * FROM #Logs ORDER BY LogDate DESC

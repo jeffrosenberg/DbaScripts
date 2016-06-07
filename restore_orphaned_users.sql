@@ -4,6 +4,13 @@ USE [Amtrak]
 exec sp_change_users_login 'report';
 GO
 
+-------------------------------------------------------------------------------
+--Easy fix: ALTER USER
+ALTER USER [user] WITH LOGIN = [user]
+
+-----------------------------------------------------------------------------
+--Difficult fix: Recreate orphaned users and with explicit SIDs
+
 --Get logins, SIDs, and password hashes
 DECLARE @loginName AS sysname;
 
@@ -13,9 +20,6 @@ WHERE sl.name = @loginName
 
 USE [Master]
 GO
-
------------------------------------------------------------------------------
---Drop logins for orphaned users and recreate them with explicit SIDs
 
 --We know the password
 DROP LOGIN cfuser2;

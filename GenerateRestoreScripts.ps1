@@ -1,16 +1,16 @@
 ﻿#Alter these variables to retrieve specific backups
 $serverFolder = 'AGR-SQL-PROD-CLUS$agrsqlserv-prd-ag01';
-$dbName = "Amtrak";
-$restoreType = "FULL"; # FULL / DIFF / LOG
+$dbName = "DBUtilities";
+$restoreType = "LOG"; # FULL / DIFF / LOG
 
 #Figure out if this is a DATABASE (full/diff) or LOG restore
 $operationType = switch ($restoreType) { "LOG" { "LOG" } default { "DATABASE" }}
 
 #region Preset strings
 $basePath = '\\commvault\SQLDump\'
-$restoreStmt_Db = "RESTORE FILELISTONLY`n--$operationType $dbName`nFROM ";
+$restoreStmt_Db = "RESTORE FILELISTONLY`n--$operationType $dbName`nFROM`n  ";
 $restoreStmtOptions_Db = "WITH NORECOVERY,`n  CHECKSUM, STOP_ON_ERROR,`n  STATS = 5";
-$restoreStmt_Log = "RESTORE $operationType $dbName`nFROM ";
+$restoreStmt_Log = "RESTORE $operationType $dbName`nFROM`n  ";
 $restoreStmtOptions_Log = "WITH NORECOVERY, STOP_ON_ERROR";
 #endregion
 
@@ -26,7 +26,7 @@ $countIterations = 0;
 #A few actions depend on whether this is a DATABASE (full/diff) or LOG restore
 if ($operationType -eq "LOG") {
     $restoreStmt = "";
-    $bakFiles = Get-ChildItem -Path $path -Filter "*$dateString*"; #Get only today's logs
+    $bakFiles = Get-ChildItem -Path $path #-Filter "*$dateString*"; #Get only today's logs
 }
 else {
     $restoreStmt = $restoreStmt_Db;
