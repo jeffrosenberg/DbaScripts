@@ -1,6 +1,8 @@
 #Files specific to Olson
 *olson*
+*idera*
 GenerateRestoreScripts*
+RestoreExamples.sql
 
 #Unwanted file types
 *.zip
