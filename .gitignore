@@ -1,6 +1,11 @@
 #Files specific to Olson
 *olson*
 *idera*
+*yosemite*
+hgp*.sql
+dlb*.sql
+pfc*.sql
+agr*.sql
 GenerateRestoreScripts*
 RestoreExamples.sql
 
