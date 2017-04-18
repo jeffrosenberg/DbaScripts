@@ -1,7 +1,7 @@
 ﻿#Alter these variables to retrieve specific backups
-$serverFolder = 'AGR-SQL-PROD-CLUS$agrsqlserv-prd-ag01';
-$dbName = "DBUtilities";
-$restoreType = "LOG"; # FULL / DIFF / LOG
+$serverFolder = '\\commvault\SQLDump\tru-db-cluster$TRU-DB-AG';
+$dbName = "GBC";
+$restoreType = "FULL"; # FULL / DIFF / LOG
 
 #Figure out if this is a DATABASE (full/diff) or LOG restore
 $operationType = switch ($restoreType) { "LOG" { "LOG" } default { "DATABASE" }}

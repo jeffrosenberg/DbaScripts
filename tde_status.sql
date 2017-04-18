@@ -1,4 +1,5 @@
---adapted from: http://blog.simplybinary.com/post/48198045010/sql-server-tdetransparent-data-encryption-status
+-- TDE status
+-- adapted from: http://blog.simplybinary.com/post/48198045010/sql-server-tdetransparent-data-encryption-status
 
 SELECT 
   database_id as 'Database ID', name as 'Database Name', 

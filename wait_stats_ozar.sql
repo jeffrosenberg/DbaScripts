@@ -11,36 +11,86 @@ DROP TABLE #ignorable_waits;
 GO
 create table #ignorable_waits (wait_type nvarchar(256) PRIMARY KEY);
 GO
-/* We aren't using row constructors to be SQL 2005 compatible */
+
+-- Ignorable waits replaced with Paul Randal's instead - JR
 set nocount on;
-insert #ignorable_waits (wait_type) VALUES ('REQUEST_FOR_DEADLOCK_SEARCH');
-insert #ignorable_waits (wait_type) VALUES ('SQLTRACE_INCREMENTAL_FLUSH_SLEEP');
-insert #ignorable_waits (wait_type) VALUES ('SQLTRACE_BUFFER_FLUSH');
-insert #ignorable_waits (wait_type) VALUES ('LAZYWRITER_SLEEP');
-insert #ignorable_waits (wait_type) VALUES ('XE_TIMER_EVENT');
-insert #ignorable_waits (wait_type) VALUES ('XE_DISPATCHER_WAIT');
-insert #ignorable_waits (wait_type) VALUES ('FT_IFTS_SCHEDULER_IDLE_WAIT');
-insert #ignorable_waits (wait_type) VALUES ('LOGMGR_QUEUE');
-insert #ignorable_waits (wait_type) VALUES ('CHECKPOINT_QUEUE');
-insert #ignorable_waits (wait_type) VALUES ('BROKER_TO_FLUSH');
-insert #ignorable_waits (wait_type) VALUES ('BROKER_TASK_STOP');
-insert #ignorable_waits (wait_type) VALUES ('BROKER_EVENTHANDLER');
-insert #ignorable_waits (wait_type) VALUES ('SLEEP_TASK');
-insert #ignorable_waits (wait_type) VALUES ('WAITFOR');
-insert #ignorable_waits (wait_type) VALUES ('DBMIRROR_DBM_MUTEX')
-insert #ignorable_waits (wait_type) VALUES ('DBMIRROR_EVENTS_QUEUE')
-insert #ignorable_waits (wait_type) VALUES ('DBMIRRORING_CMD');
-insert #ignorable_waits (wait_type) VALUES ('DISPATCHER_QUEUE_SEMAPHORE');
-insert #ignorable_waits (wait_type) VALUES ('BROKER_RECEIVE_WAITFOR');
-insert #ignorable_waits (wait_type) VALUES ('CLR_AUTO_EVENT');
-insert #ignorable_waits (wait_type) VALUES ('DIRTY_PAGE_POLL');
-insert #ignorable_waits (wait_type) VALUES ('HADR_FILESTREAM_IOMGR_IOCOMPLETION');
-insert #ignorable_waits (wait_type) VALUES ('ONDEMAND_TASK_QUEUE');
-insert #ignorable_waits (wait_type) VALUES ('FT_IFTSHC_MUTEX');
-insert #ignorable_waits (wait_type) VALUES ('CLR_MANUAL_EVENT');
-insert #ignorable_waits (wait_type) VALUES ('SP_SERVER_DIAGNOSTICS_SLEEP');
-insert #ignorable_waits (wait_type) VALUES ('QDS_CLEANUP_STALE_QUERIES_TASK_MAIN_LOOP_SLEEP');
-insert #ignorable_waits (wait_type) VALUES ('QDS_PERSIST_TASK_MAIN_LOOP_SLEEP');
+insert #ignorable_waits 
+(wait_type) 
+VALUES 
+(N'BROKER_EVENTHANDLER'), 
+(N'BROKER_RECEIVE_WAITFOR'),
+(N'BROKER_TASK_STOP'), 
+(N'BROKER_TO_FLUSH'),
+(N'BROKER_TRANSMITTER'), 
+(N'CHECKPOINT_QUEUE'),
+(N'CHKPT'), 
+(N'CLR_AUTO_EVENT'),
+(N'CLR_MANUAL_EVENT'), 
+(N'CLR_SEMAPHORE'),
+
+-- Maybe comment these four if you have mirroring issues
+(N'DBMIRROR_DBM_EVENT'), 
+(N'DBMIRROR_EVENTS_QUEUE'),
+(N'DBMIRROR_WORKER_QUEUE'), 
+(N'DBMIRRORING_CMD'),
+
+(N'DIRTY_PAGE_POLL'), 
+(N'DISPATCHER_QUEUE_SEMAPHORE'),
+(N'EXECSYNC'), 
+(N'FSAGENT'),
+(N'FT_IFTS_SCHEDULER_IDLE_WAIT'), 
+(N'FT_IFTSHC_MUTEX'),
+
+-- Maybe comment these six if you have AG issues
+(N'HADR_CLUSAPI_CALL'), 
+(N'HADR_FILESTREAM_IOMGR_IOCOMPLETION'),
+(N'HADR_LOGCAPTURE_WAIT'), 
+(N'HADR_NOTIFICATION_DEQUEUE'),
+(N'HADR_TIMER_TASK'), 
+(N'HADR_WORK_QUEUE'),
+
+(N'KSOURCE_WAKEUP'),
+(N'LAZYWRITER_SLEEP'),
+(N'LOGMGR_QUEUE'),
+(N'MEMORY_ALLOCATION_EXT'),
+(N'ONDEMAND_TASK_QUEUE'),
+(N'PREEMPTIVE_XE_GETTARGETSTATE'),
+(N'PWAIT_ALL_COMPONENTS_INITIALIZED'),
+(N'PWAIT_DIRECTLOGCONSUMER_GETNEXT'),
+(N'QDS_PERSIST_TASK_MAIN_LOOP_SLEEP'),
+(N'QDS_ASYNC_QUEUE'),
+(N'QDS_CLEANUP_STALE_QUERIES_TASK_MAIN_LOOP_SLEEP'),
+(N'QDS_SHUTDOWN_QUEUE'),
+(N'REDO_THREAD_PENDING_WORK'),
+(N'REQUEST_FOR_DEADLOCK_SEARCH'),
+(N'RESOURCE_QUEUE'),
+(N'SERVER_IDLE_CHECK'),
+(N'SLEEP_BPOOL_FLUSH'),
+(N'SLEEP_DBSTARTUP'),
+(N'SLEEP_DCOMSTARTUP'),
+(N'SLEEP_MASTERDBREADY'),
+(N'SLEEP_MASTERMDREADY'),
+(N'SLEEP_MASTERUPGRADED'),
+(N'SLEEP_MSDBSTARTUP'),
+(N'SLEEP_SYSTEMTASK'),
+(N'SLEEP_TASK'),
+(N'SLEEP_TEMPDBSTARTUP'),
+(N'SNI_HTTP_ACCEPT'),
+(N'SP_SERVER_DIAGNOSTICS_SLEEP'),
+(N'SQLTRACE_BUFFER_FLUSH'),
+(N'SQLTRACE_INCREMENTAL_FLUSH_SLEEP'),
+(N'SQLTRACE_WAIT_ENTRIES'),
+(N'WAIT_FOR_RESULTS'),
+(N'WAITFOR'),
+(N'WAITFOR_TASKSHUTDOWN'),
+(N'WAIT_XTP_RECOVERY'),
+(N'WAIT_XTP_HOST_WAIT'),
+(N'WAIT_XTP_OFFLINE_CKPT_NEW_LOG'),
+(N'WAIT_XTP_CKPT_CLOSE'),
+(N'XE_DISPATCHER_JOIN'),
+(N'XE_DISPATCHER_WAIT'),
+(N'XE_TIMER_EVENT')
+
 GO
 /* Want to manually exclude an event and recalculate?*/
 /* insert #ignorable_waits (wait_type) VALUES (''); */

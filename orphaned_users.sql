@@ -1,16 +1,18 @@
-USE [Amtrak]
+USE [Hyatt]
 
 --Get a list of orphaned users
 exec sp_change_users_login 'report';
-GO
+
+RETURN;
 
 -------------------------------------------------------------------------------
 --Easy fix: ALTER USER
-ALTER USER [user] WITH LOGIN = [user]
+ALTER USER [prodtest] WITH LOGIN = [prodtest]
 
 -----------------------------------------------------------------------------
 --Difficult fix: Recreate orphaned users and with explicit SIDs
 
+/*
 --Get logins, SIDs, and password hashes
 DECLARE @loginName AS sysname;
 
@@ -44,3 +46,4 @@ USE [Amtrak]
 --Re-run the report
 exec sp_change_users_login 'report';
 GO
+*/
