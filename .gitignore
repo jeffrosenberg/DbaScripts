@@ -2,10 +2,18 @@
 *olson*
 *idera*
 *yosemite*
-hgp*.sql
-dlb*.sql
-pfc*.sql
-agr*.sql
+*sensu*
+hgp*
+*Hyatt*
+dlb*
+*Darden*
+pfc*
+agr*
+*Amtrak*
+hhh*
+*Hilton*
+*pvilo*
+*pvlo*
 GenerateRestoreScripts*
 RestoreExamples.sql
 
