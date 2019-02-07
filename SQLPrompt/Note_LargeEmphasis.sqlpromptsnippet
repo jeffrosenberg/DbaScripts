@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Note_LargeEmphasis</Title>
+      <Shortcut>Note_LargeEmphasis</Shortcut>
+      <Description>Create a bold separator for a very important note</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--=============================================================================
+--
+--=============================================================================]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

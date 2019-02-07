@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>md5</Title>
+      <Shortcut>md5</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @src NVARCHAR(MAX)
+SET @src = 'This value to convert to MD5.'
+SELECT CONVERT(NVARCHAR(32),HashBytes('MD5', @src),2)						--option A
+SELECT SUBSTRING(sys.fn_sqlvarbasetostr(HASHBYTES('MD5',@src)),3,32)		--undocumented option B]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>droptest</Title>
+      <Shortcut>droptest</Shortcut>
+      <Description>Test Table Exists Then Drop</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>TableName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[IF OBJECT_ID('$TableName$') IS NOT NULL DROP TABLE $TableName$]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

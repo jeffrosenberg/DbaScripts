@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckTableFragmentation</Title>
+      <Shortcut>CheckTableFragmentation</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <DatabaseName, sysname, Hyatt>
+GO
+
+SELECT
+	i.name
+  , i.type
+  , dmf.page_count * 8 AS 'size'
+  , ROUND(dmf.avg_fragmentation_in_percent, 0) AS avg_fragmentation_in_percent
+  , i.fill_factor
+FROM
+	sys.dm_db_index_physical_stats(DB_ID('<DatabaseName, sysname, Hyatt>'), OBJECT_ID('<TableName, sysname, HotelAccrual>'), NULL, NULL,
+								   'limited') dmf
+	INNER JOIN sys.indexes i
+		ON ( ( i.object_id = dmf.object_id )
+			 AND ( i.index_id = dmf.index_id )
+		   )
+WHERE
+	( dmf.alloc_unit_type_desc = 'IN_ROW_DATA' );]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

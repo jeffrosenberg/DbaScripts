@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckPowerPlanHighPerf</Title>
+      <Shortcut>CheckPowerPlanHighPerf</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE
+@value VARCHAR(64),
+@key VARCHAR(512) = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\'
++ 'ControlPanel\NameSpace\{025A5937-A6BE-4686-A844-36FE4BEC8B6D}';
+
+EXEC master..xp_regread 
+@rootkey = 'HKEY_LOCAL_MACHINE',
+@key = @key,
+@value_name = 'PreferredPlan',
+@value = @value OUTPUT;
+
+SELECT @value AS CurrentValue, '381b4222-f694-41f0-9685-ff5bb260df2e' AS DesiredHighPerfValue;
+
+--381b4222-f694-41f0-9685-ff5bb260df2e]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

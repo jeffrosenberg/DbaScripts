@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>stringConcatenateForXmlPath</Title>
+      <Shortcut>stringConcatenateForXmlPath</Shortcut>
+      <Description>Examle of doing string concatenation with FOR XML PATH</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- via Aaron Bertrand
+-- https://sqlperformance.com/2014/08/t-sql-queries/sql-server-grouped-concatenation
+SELECT Name, Pets = STUFF((SELECT N', ' + Pet 
+  FROM dbo.FamilyMemberPets AS p2
+   WHERE p2.name = p.name 
+   ORDER BY Pet
+   FOR XML PATH(N''), TYPE).value(N'.[1]', N'nvarchar(max)'), 1, 2, N'')
+FROM dbo.FamilyMemberPets AS p
+GROUP BY Name
+ORDER BY Name;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

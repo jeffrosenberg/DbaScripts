@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckPlans</Title>
+      <Shortcut>CheckPlans</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT
+er.session_id ,
+qp.query_plan
+FROM sys.dm_exec_requests er
+CROSS APPLY sys. dm_exec_query_plan ( er.plan_handle ) qp
+
+
+-- Read more: http://www.sqldbadiaries.com/2010/11/22/get-graphical-execution-plans-for-all-the-active-sessions/#ixzz2QqJdOCCd
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

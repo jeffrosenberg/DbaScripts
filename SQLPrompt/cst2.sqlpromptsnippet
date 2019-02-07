@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cst2</Title>
+      <Shortcut>cst2</Shortcut>
+      <Description>System tables/schemas</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @Tablename VARCHAR(MAX), @SchemaName VARCHAR(MAX)
+SET @TableName = 'Product_Dim'
+SET @SchemaName = 'StagingWIP'
+SELECT 
+	'SELECT * FROM ' + s.name + '.' + t.name
+FROM  
+	sys.tables AS t 
+	INNER JOIN sys.schemas AS s
+	ON t.schema_id = s.schema_id
+WHERE
+	t.name = @Tablename
+	AND 
+	s.name = @SchemaName]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

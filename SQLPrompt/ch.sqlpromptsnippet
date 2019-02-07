@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ch</Title>
+      <Shortcut>ch</Shortcut>
+      <Description>Comment Header</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[	/*=================================================
+	Created By:  	<Created User, sysname, [Fullname or MADOMAIN\user]> 
+	Created Date: 	<Created Date, sysname, MM/DD/YYYY> 
+	TFS Path: 		<TFS Path, sysname, $/Project/...>
+	Purpose:  		<Purpose, sysname, Describe the responsibility or function of the procedure .>
+		
+	Parameters:  	
+					<@Param1, sysname, @p1> 
+						Datatype:  <Datatype_For_Param1, , INT>
+						Default:   <Default_Value_For_Param1, , 0>, 
+						Desc:	   <Param1 Description, , List valid values and/or description of parameter and it's expected values>
+					<@Param2, sysname, @p2> 
+						Datatype:  <Datatype_For_Param2, , INT>
+						Default:   <Default_Value_For_Param2, , 0>, 
+						Desc:	   <Param2 Description, , List valid values and/or description of parameter and it's expected values>
+	 
+	Updates:
+	Date  	Author    Change
+	<Created Date, sysname, MM/DD/YYYY>  	<Created User, sysname, [Fullname or MADOMAIN\user]>     Initial Creation.
+	 
+	=================================================*/]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

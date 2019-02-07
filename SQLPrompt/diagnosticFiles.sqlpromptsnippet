@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>diagnosticFiles</Title>
+      <Shortcut>diagnosticFiles</Shortcut>
+      <Description>Search for diagnostic files (SQLDIAG*.xel)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--
+-- Get list of SQL Diagnostic log files
+--
+
+-- Get MSSQL log path (depends on version number)
+DECLARE @sqlVersion AS varchar(2) = LEFT(CAST(SERVERPROPERTY('ProductVersion') AS varchar(255)), 2)
+DECLARE @sqlDiagDir AS varchar(2000) = 'C:\Program Files\Microsoft SQL Server\MSSQL' + @sqlVersion + '.MSSQLServer\MSSQL\Log\'
+
+-- Use xp_cmdshell with "dir" command to do a wildcard search
+DECLARE @cmd varchar(4000);
+SET @cmd = 'dir "' + @sqlDiagDir + '*SQLDIAG*.xel"';
+EXEC xp_cmdshell @cmd;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

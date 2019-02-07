@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>tdeStatus</Title>
+      <Shortcut>tdeStatus</Shortcut>
+      <Description>Transparent Data Encryption status</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- TDE status
+-- adapted from: http://blog.simplybinary.com/post/48198045010/sql-server-tdetransparent-data-encryption-status
+
+SELECT 
+  database_id as 'Database ID', name as 'Database Name', 
+  CASE encryption_state
+    WHEN 0 THEN 'No database encryption key present, no encryption'
+    WHEN 1 THEN 'Unencrypted'
+    WHEN 2 THEN 'Encryption in progress'
+    WHEN 3 THEN 'Encrypted'
+    WHEN 4 THEN 'Key change in progress'
+    WHEN 5 THEN 'Decryption in progress'
+    WHEN 6 THEN 'Protection change in progress'
+    ELSE 'Not encrypted'
+    END as Status
+from sys.sysdatabases d 
+left outer join sys.dm_database_encryption_keys e
+  on e.database_id = d.dbid
+--WHERE d.dbid <= 4 OR d.name = 'darden']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

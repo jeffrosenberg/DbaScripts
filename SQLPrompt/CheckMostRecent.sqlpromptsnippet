@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckMostRecent</Title>
+      <Shortcut>CheckMostRecent</Shortcut>
+      <Description>Get Most Recent of a Record in table with Multiple Versions</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT
+	StageKey
+	, Type
+	, TypeID
+	, Description
+	, BrandKey
+	, BatchLogID
+	, BatchDate
+	, ChangeType
+
+FROM
+       (
+       SELECT
+       StageKey
+       , Type
+       , TypeID
+       , Description
+       , BrandKey
+       , BatchLogID
+       , BatchDate
+       , ChangeType
+       , MAX(StageKey) OVER (PARTITION BY [Type], TypeID) AS MaxStageKey
+
+       FROM
+       Staging.DiscountTypes WITH(NOLOCK)
+       ) X
+
+WHERE
+StageKey = MaxStageKey
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

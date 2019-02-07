@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>RandomNumberTechniques</Title>
+      <Shortcut>RandomNumberTechniques</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Random Techniques
+SELECT 
+  1000000 + (CONVERT(INT, CRYPT_GEN_RANDOM(3)) % 1000000),		-- CryptRand
+  1000000 + (CONVERT(INT, RAND()*1000000) % 1000000),			-- Rand
+  1000000 + (ABS(CHECKSUM(NEWID())) % 1000000);					-- NEWID/CHECKSUM/ABS
+SELECT ABS(CAST(CAST(NEWID() AS VARBINARY) AS INT))
+SELECT NEWID() --alphanumeric
+SELECT CAST(RIGHT(CAST(CAST(NEWID() AS VARBINARY(36)) AS BIGINT), 10) AS CHAR(10))
+DECLARE @value INT = 123
+SELECT CAST(CHECKSUM(NEWID(), @value)&0x7fffffff AS float)/CAST(0x7fffffff AS int)
+
+-- CryptRand Options from MSDN: http://msdn.microsoft.com/query/dev10.query?appId=Dev10IDEF1&l=EN-US&k=k(CAST);k(DevLang-TSQL)&rd=true
+SELECT CRYPT_GEN_RANDOM(50) ;
+SELECT CRYPT_GEN_RANDOM(4, 0x25F18060) ;
+
+-- Random No Collision techniques
+-- Option 1
+-- Load tables with NEWID guid values and lookup
+
+-- Option 2
+http://www.mssqltips.com/sqlservertip/3055/generating-random-numbers-in-sql-server-without-collisions/?utm_source=dailynewsletter&utm_medium=email&utm_content=headline&utm_campaign=20141002
+
+-- Option 3
+-- variation of 1 using a Service Broker queue to manage available numbers
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

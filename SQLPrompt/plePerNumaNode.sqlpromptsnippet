@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>plePerNumaNode</Title>
+      <Shortcut>plePerNumaNode</Shortcut>
+      <Description>Page Life Expectancy per NUMA node</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT numa_node = ISNULL(NULLIF(ple.instance_name, ''), 'ALL')
+     , ple_sec = ple.cntr_value
+     , db_node_mem_GB = dnm.cntr_value*8/1048576
+     , ple_per_4gb = ple.cntr_value * 4194304 / (dnm.cntr_value*8) --Should be 300+
+FROM sys.dm_os_performance_counters ple join sys.dm_os_performance_counters dnm
+    on ple.instance_name = dnm.instance_name
+    and ple.counter_name='Page life expectancy' -- PLE per NUMA node
+    and dnm.counter_name='Database pages' -- buffer pool size (pages) per NUMA node]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

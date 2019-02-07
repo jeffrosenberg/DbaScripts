@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ConvertDateTimeBigIntBack</Title>
+      <Shortcut>ConvertDateTimeBigIntBack</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @d DATETIME = GETDATE()
+DECLARE @vb VARBINARY(8)
+DECLARE @i BIGINT
+
+SELECT @vb = CONVERT(VARBINARY(8), @d)
+SELECT @i = CONVERT(BIGINT, @vb)
+
+SELECT @d, @vb, @i, CONVERT(DATETIME, CONVERT(VARBINARY(8), @i))
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

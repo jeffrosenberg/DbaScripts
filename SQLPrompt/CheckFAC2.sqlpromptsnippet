@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckFAC2</Title>
+      <Shortcut>CheckFAC2</Shortcut>
+      <Description>Detect Server-Side API Cursor (fetch api cursor)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[select 
+    cur.* 
+from 
+    sys.dm_exec_connections con
+    cross apply sys.dm_exec_cursors(con.session_id) as cur
+where
+    cur.fetch_buffer_size = 1 
+    and cur.properties LIKE 'API%'	-- API cursor (Transact-SQL cursors always have a fetch buffer of 1)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

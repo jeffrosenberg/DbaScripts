@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>VAS</Title>
+      <Shortcut>VAS</Shortcut>
+      <Description>Check SQL VAS Loaded Modules</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT olm.[name], olm.[file_version], olm.[product_version], olm.[description], ova.[region_size_in_bytes], olm.[base_address], ova.[region_base_address], ova.[region_type]
+FROM sys.dm_os_virtual_address_dump ova
+INNER JOIN sys.dm_os_loaded_modules olm ON olm.base_address = ova.region_allocation_base_address
+WHERE company NOT LIKE '%microsoft%'
+ORDER BY name]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

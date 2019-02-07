@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Powershell_SQLCMDCalls</Title>
+      <Shortcut>Powershell_SQLCMDCalls</Shortcut>
+      <Description>Example to call Powershell commands from T-SQL session via SQLCMD mode</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--OPTION 1
+--!! PowerShell -InputFormat none -Command "& { Write-Output 'Hello PowerShell World!' }"
+
+
+--!! PowerShell -InputFormat none -Command "& { c:\Junk\ExtractZips.ps1 }"
+
+--OPTION 2
+DECLARE @sql VARCHAR(8000)
+--SET @sql = 'c:\windows\system32\windowspowershell\v1.0\powershell.exe -file "c:\Junk\ExtractZips.ps1" -nologo'
+--SET @sql = 'c:\windows\system32\windowspowershell\v1.0\powershell.exe -c "$(get-process powershell | select -first 1).path" -nologo'
+--SET @sql = 'powershell.exe -ExecutionPolicy UnRestricted -File "c:\Junk\ExtractZips.ps1"'
+--SET @sql = 'powershell.exe -Command "& {cd\; cd Junk; ls}"'
+SET @sql = 'powershell.exe -File c:\Junk\ExtractZips.ps1'
+--SET @sql = 'powershell.exe -Command "& {[Environment]::UserName}"'
+EXEC xp_cmdshell @sql  
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

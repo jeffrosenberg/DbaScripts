@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>todayMidnight</Title>
+      <Shortcut>todayMidnight</Shortcut>
+      <Description>Get a datetime for the current day as 12:00 AM</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0) /* Today midnight */]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

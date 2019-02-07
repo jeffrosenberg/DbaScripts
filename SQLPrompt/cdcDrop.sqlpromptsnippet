@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cdcDrop</Title>
+      <Shortcut>cdcDrop</Shortcut>
+      <Description>Drop CDC objects</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT 'DROP TABLE ' + s.NAME + '.' + t.name FROM  sys.tables AS t
+INNER JOIN sys.schemas AS s ON t.schema_id = s.schema_id
+WHERE s.name = 'cdc'
+
+SELECT 'DROP PROCEDURE ' + s.NAME + '.' + p.name FROM  sys.procedures AS p
+INNER JOIN sys.schemas AS s ON p.schema_id = s.schema_id
+WHERE s.name = 'cdc'
+
+/* add other object types here */
+
+DROP SCHEMA cdc
+
+DROP USER cdc]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

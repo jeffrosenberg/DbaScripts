@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>hexbin</Title>
+      <Shortcut>hexbin</Shortcut>
+      <Description>Convert Hex to Binary and Vice Versa</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Convert hexstring value in a variable to varbinary:
+declare @hexstring varchar(max);
+set @hexstring = 'abcedf012439';
+select cast('' as xml).value('xs:hexBinary( substring(sql:variable("@hexstring"), sql:column("t.pos")) )', 'varbinary(max)')
+from (select case substring(@hexstring, 1, 2) when '0x' then 3 else 0 end) as t(pos)
+go
+
+-- Convert binary value in a variable to hexstring:
+declare @hexbin varbinary(max);
+set @hexbin = 0xabcedf012439;
+select '0x' + cast('' as xml).value('xs:hexBinary(sql:variable("@hexbin") )', 'varchar(max)');
+go]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckNtfsAllocationUnitSize</Title>
+      <Shortcut>CheckNtfsAllocationUnitSize</Shortcut>
+      <Description>Checks NTFS Allocation Unit Block Size (Bytes per Cluster)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Change M: to desired drive to check
+-- "Bytes per Cluster" in result set is Allocation Unit Block Size
+xp_cmdshell 'fsutil fsinfo ntfsinfo M:']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>clearEnvironment</Title>
+      <Shortcut>clearEnvironment</Shortcut>
+      <Description>Clear Proc Cache, Buffer Cache, and wait stats</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[IF @@SERVERNAME LIKE '%p[0-9]%' OR @@SERVERNAME LIKE '%py[0-9]%'
+BEGIN
+  RAISERROR('This looks like a production environment!',16,1);
+  RETURN;
+END
+
+DBCC FREEPROCCACHE
+DBCC DROPCLEANBUFFERS
+DBCC SQLPERF('sys.dm_os_wait_stats', CLEAR)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

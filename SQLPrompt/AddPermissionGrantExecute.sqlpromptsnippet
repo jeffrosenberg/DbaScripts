@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AddPermissionGrantExecute</Title>
+      <Shortcut>AddPermissionGrantExecute</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [master]
+GO
+/*
+	In sql mgmt studio, to replace template parameters below (e.g. Database Name):
+	
+	press=>  CTRL+SHIFT+M 
+	OR 
+	click=> Query Menu->Specify Values for Template Parameters
+
+*/
+
+USE <Database Name, SYSNAME, MyDB1>
+GO
+
+-- Add Grant Execute
+GRANT EXECUTE TO [<Domain User, SYSNAME, MyDomain\MyUserName>]]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

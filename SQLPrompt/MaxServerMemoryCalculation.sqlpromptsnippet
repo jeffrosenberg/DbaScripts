@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MaxServerMemoryCalculation</Title>
+      <Shortcut>MaxServerMemoryCalculation</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[/* RESERVATION CALC */
+/*
+1gb for OS default +
+1gb for reserved for each of 4gb installed up to 16gb +
+1gb for each of 8gb over 16gb + 
+reserved for OS processing (unpacking and BCP files)
+
+So, for a server with 40GB memory (like TRU):
+1 + (os default)
+1 * 4 + (16gb / 4gb = 4)
+1 * 3 +	(40gb - 16gb = 24gb / 8gb = 3)
+2 gb (OS processing - random selected given previously none reserved)
+= 10 gb OS reservation
+Max Memory formula:
+40gb (total) - 10gb (reserved OS) = 30gb
+
+REFERENCE:  http://www.sqlskills.com/blogs/jonathan/how-much-memory-does-my-sql-server-actually-need/
+
+*/
+DECLARE 
+	@ServerMemoryGB INT						-- Total memory in GB available to server
+	, @SQLMaxMemoryGB INT = 0				-- Default to 0 if to be calculated, else enter desired amount to reserve if want to override and set explicitly
+	, @SQLMaxMemoryGBReserve INT = 0		-- Counter to calculate amount to reserve from total in deriving SQL Max.  Total - Reserve = SQL Max
+	, @Execute BIT = 0						-- CHANGE TO RUN: 0 to print results of calc; 1 to execute and apply to SQL instance
+	, @AdditionalReserve INT = 0 --2		-- OPTIONAL: Reserve for additional processing (e.g. files or sftp on server; ssis and ssrs on shared server...)
+	, @SQLMaxMemoryMBSetting NVARCHAR(10)	-- Used to convert to MB and store as NVARCHAR for use by sp_configure when applied
+
+SET @ServerMemoryGB =						-- Get System Memory and convert to GB
+						(
+						SELECT 
+							physical_memory_kb/1024/1024 
+						FROM 
+							sys.dm_os_sys_info
+						)
+
+IF @SQLMaxMemoryGB = 0						-- no override
+BEGIN
+
+	-- (os default reserve)
+	SET @SQLMaxMemoryGBReserve = 1 + @AdditionalReserve
+
+	-- (1GB for each 4GB increment reserve up to 16GB)	
+	IF @ServerMemoryGB >= 16
+	BEGIN
+		SET @SQLMaxMemoryGBReserve += 4
+	
+		-- (1GB for each 8GB increment above 16 GB)
+		SET @SQLMaxMemoryGBReserve += ((@ServerMemoryGB - 16) / 8)
+	END
+	ELSE 
+		SET @SQLMaxMemoryGBReserve += (@ServerMemoryGB / 4)
+
+	SET @SQLMaxMemoryGB = @ServerMemoryGB - @SQLMaxMemoryGBReserve
+END
+
+	-- Calculate Setting 
+	SET @SQLMaxMemoryMBSetting = CONVERT(NVARCHAR(10), (@SQLMaxMemoryGB * 1024))
+
+IF @Execute = 0 
+BEGIN
+	PRINT 'Server Memory (GB): ' + CONVERT(VARCHAR(50), @ServerMemoryGB)
+	PRINT 'Calculated SQL Max Memory (GB): ' + CONVERT(VARCHAR(50), @SQLMaxMemoryGB)
+	PRINT 'Configure SQL Max Memory Setting (MB): ' + @SQLMaxMemoryMBSetting
+END 
+ELSE 
+BEGIN 
+	EXEC sys.sp_configure N'max server memory (MB)', @SQLMaxMemoryMBSetting;
+	RECONFIGURE WITH OVERRIDE;
+END
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

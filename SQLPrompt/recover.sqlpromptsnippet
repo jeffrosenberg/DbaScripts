@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>recover</Title>
+      <Shortcut>recover</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <Database, Database Name, Test>
+SELECT execquery.last_execution_time AS [Date Time], execsql.text AS [Script] FROM sys.dm_exec_query_stats AS execquery
+CROSS APPLY sys.dm_exec_sql_text(execquery.sql_handle) AS execsql
+ORDER BY execquery.last_execution_time DESC
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

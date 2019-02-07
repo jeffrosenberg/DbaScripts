@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>StartSQLServiceOrInstance</Title>
+      <Shortcut>StartSQLServiceOrInstance</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--From a command prompt (run as administrator), enter one of the following commands:
+net start "SQL Server (MSSQLSERVER)"
+-or-
+net start MSSQLSERVER
+
+--To start a named instance of SQL Server
+From a command prompt, enter one of the following commands. Replace <instancename> with the name of the instance you want to manage.
+net start "SQL Server (<instance name, text, sql2014>)"
+-or-
+net start MSSQL$<instance name, text, sql2014>]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

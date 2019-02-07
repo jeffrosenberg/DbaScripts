@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckCountNumOfCharacterInString</Title>
+      <Shortcut>CheckCountNumOfCharacterInString</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @char2count CHAR(1) = '|'
+DECLARE @teststring VARCHAR(MAX) = 'ABC|123'
+
+SELECT LEN(@teststring)-LEN(REPLACE(@teststring, @char2count, '')) ]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

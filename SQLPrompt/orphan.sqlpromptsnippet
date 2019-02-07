@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>orphan</Title>
+      <Shortcut>orphan</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[sp_change_users_login 'report' --then, using the output from this:
+
+sp_change_users_login 'update_one', 'SQLLINK','SQLLINK' --(or whatever the login/user names is)
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dropDatabase</Title>
+      <Shortcut>dropDatabase</Shortcut>
+      <Description>Drop database WITH ROLLBACK IMMEDIATE</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>Name</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SET DEADLOCK_PRIORITY HIGH
+GO
+
+ALTER DATABASE $Name$ SET SINGLE_USER WITH ROLLBACK IMMEDIATE
+GO 
+
+DROP DATABASE $Name$
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

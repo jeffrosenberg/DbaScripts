@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>swa</Title>
+      <Shortcut>swa</Shortcut>
+      <Description>Common sp_whoisactive call</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[sp_whoisactive @get_outer_command=1, @show_sleeping_spids=0, @get_task_info=2, @get_plans=1]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

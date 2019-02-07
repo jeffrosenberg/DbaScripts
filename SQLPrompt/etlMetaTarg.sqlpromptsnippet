@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>etlMetaTarg</Title>
+      <Shortcut>etlMetaTarg</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+INSERT INTO SSIS.EtlMetadataTargetObjects
+        (
+         TargetObject
+       , ActiveStatus
+       , PackageName
+       , SQLRetrieveRowCount
+       , SQLUpdateExisting
+       , SQLUpdateExistingExpire
+       , SQLSourceCombinedPreProcessing
+       , SourceStageTableNameCombined
+       , SQLTargetWipDrop
+       , SQLTargetWipCreate
+       , WipTableName
+       , CurrentViewName
+       , CreateDateTime
+       , UpdateDateTime
+        )
+VALUES  (
+         'dbo.<TargetTableName, String, FactTransactions>'
+       , -- TargetObject - varchar(100)
+         1
+       , -- ActiveStatus - bit
+         '<PackageName, String, PfcpwSsisTallyMdbFactsTransactions.dtsx>'
+       , -- PackageName - varchar(100)
+         'SELECT COUNT(1) FROM dbo.<TargetTableName, String, FactTransactions>'
+       , -- SQLRetrieveRowCount - varchar(1000)
+         'EXEC dbo.Update<TargetTableName, String, FactTransactions>'
+       , -- SQLUpdateExisting - varchar(2000)
+         '--N/A'
+       , -- SQLUpdateExistingExpire - varchar(2000)
+         '--N/A'
+       , -- SQLSourceCombinedPreProcessing - varchar(500)
+         'dbo.Stage<TargetTableName, String, FactTransactions>'
+       , -- SourceStageTableNameCombined - varchar(100)
+         'exec CreateWIPTable @TargetObject= ?, @WIPTableName= ?, @Action=''DROP'''
+       , -- SQLTargetWipDrop - varchar(100)
+         'exec CreateWIPTable @TargetObject= ?, @WIPTableName= ?, @Action=''CREATE'''
+       , -- SQLTargetWipCreate - varchar(4000)
+         'wip.<TargetTableName, String, FactTransactions>'
+       , -- WipTableName - varchar(100)
+         NULL
+       , -- CurrentViewName - varchar(100)
+         GETDATE()
+       , -- CreateDateTime - datetime
+         GETDATE()  -- UpdateDateTime - datetime
+        )]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

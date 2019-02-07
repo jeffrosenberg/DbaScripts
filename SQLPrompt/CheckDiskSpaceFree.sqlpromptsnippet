@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckDiskSpaceFree</Title>
+      <Shortcut>CheckDiskSpaceFree</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[declare @DatabaseName sysname 
+set @DatabaseName = 'master'
+
+declare @Drive table(DriveName char, FreeSpaceInMegabytes int)
+insert @Drive execute xp_fixeddrives
+
+select 
+    mas.type_desc FileType, 
+    mas.name FileName, 
+    mas.physical_name PhysicalFileName, 
+    mas.size * 8 / 1024 FileSizeInMegabytes,
+    drv.DriveName, 
+    drv.FreeSpaceInMegabytes
+from sys.master_files mas
+    left join @Drive drv on
+        left(mas.physical_name, 1) = drv.DriveName
+where database_id = db_id(@DatabaseName)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

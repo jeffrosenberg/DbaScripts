@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AppLockExample</Title>
+      <Shortcut>AppLockExample</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[BEGIN TRY
+		
+		BEGIN TRANSACTION 
+		
+		/* Insulate from Parameter Sniffing */
+		DECLARE @BLI INT = @BatchLogId
+		DECLARE @MaxAttempts INT = 30
+		DECLARE @LockTimeOut INT = 60000
+
+		/* Get Application Lock */
+		-- Reference: - http://www.sqlteam.com/article/application-locks-or-mutexes-in-sql-server-2005
+		DECLARE @Result INT 
+		DECLARE @Attempts INT = 1
+		EXEC @Result = sp_getapplock 
+			@Resource = 'PartitionSplitAppLock'
+			, @LockMode = 'Exclusive'
+			, @LockOwner = 'Transaction'
+			, @LockTimeout = @LockTimeOut
+			, @DbPrincipal = 'public' 
+			PRINT '@Result=' + CONVERT(VARCHAR(10), @Result)
+		
+		WHILE @Result!=0											--Typically @Result 0 AND 1 would be success but not getting synchronous lock creates issues on ALTER PARTITION SCHEME/FUNCTION
+		BEGIN 
+			
+			WAITFOR DELAY '00:00:00.300'
+			PRINT '<<Retrying>> ' + CONVERT(VARCHAR(10), @Attempts)
+
+			-- Retry
+			EXEC @Result = sp_getapplock 
+			@Resource = 'PartitionSplitAppLock'
+			, @LockMode = 'Exclusive'
+			, @LockOwner = 'Transaction'
+			, @LockTimeout = @LockTimeOut
+			, @DbPrincipal = 'public' 
+			PRINT '@Result=' + CONVERT(VARCHAR(10), @Result)
+
+			IF @Attempts=@MaxAttempts
+				BREAK;
+
+			SET @Attempts+=1
+		END 
+
+		IF @Result=0												--Typically @Result 0 AND 1 would be success but not getting synchronous lock creates issues on ALTER PARTITION SCHEME/FUNCTION
+		BEGIN
+		
+			PRINT 'LOCK ACQUIRED: start partition split' -- 0 and 1 are valid return values 
+		
+			/* Perform Split Behavior */
+			-- Alter Partition Function By Splitting Range To Accomodate New BatchLogId
+			IF NOT EXISTS	(
+							SELECT
+							1
+
+							FROM
+							sys.partition_functions PF WITH(NOLOCK)
+								INNER JOIN sys.partition_range_values PRV WITH(NOLOCK)
+									ON PF.function_id = PRV.function_id
+
+							WHERE
+							PRV.value = @BLI
+							)
+				
+				BEGIN
+
+					ALTER PARTITION SCHEME PS_BatchLogId NEXT USED [PRIMARY];
+
+					ALTER PARTITION FUNCTION PF_BatchLogId()
+					SPLIT RANGE (@BLI);
+
+				END
+		
+			EXEC @Result = sp_releaseapplock 
+				@Resource = 'PartitionSplitAppLock'
+				, @DbPrincipal = 'public'
+				, @LockOwner = 'Transaction' 
+			PRINT 'LOCK RELEASED: end partition split'
+
+			COMMIT; PRINT '<<Committed>>';
+
+		END
+		ELSE
+			RAISERROR ( 'Unable to acquire Lock', 16, 1 )
+
+	END TRY
+	BEGIN CATCH
+        
+		IF @@TRANCOUNT > 0
+			BEGIN ROLLBACK; PRINT '<<Rolled Back>>'; END
+			
+		DECLARE @ErrorMessage NVARCHAR(4000);
+		DECLARE @ErrorSeverity INT;
+		DECLARE @ErrorState INT;
+
+		SELECT 
+			@ErrorMessage = ERROR_MESSAGE(),
+			@ErrorSeverity = ERROR_SEVERITY(),
+			@ErrorState = ERROR_STATE();
+
+		-- Use RAISERROR inside the CATCH block to return error
+		-- information about the original error that caused
+		-- execution to jump to the CATCH block.
+		RAISERROR (@ErrorMessage, -- Message text.
+					@ErrorSeverity, -- Severity.
+					@ErrorState -- State.
+					);
+
+	END CATCH]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

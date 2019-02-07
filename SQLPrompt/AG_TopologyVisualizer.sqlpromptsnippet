@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AG_TopologyVisualizer</Title>
+      <Shortcut>AG_TopologyVisualizer</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--------------------------------------------------------------------------------- 
+-- The sample scripts are not supported under any Microsoft standard support 
+-- program or service. The sample scripts are provided AS IS without warranty  
+-- of any kind. Microsoft further disclaims all implied warranties including,  
+-- without limitation, any implied warranties of merchantability or of fitness for 
+-- a particular purpose. The entire risk arising out of the use or performance of  
+-- the sample scripts and documentation remains with you. In no event shall 
+-- Microsoft, its authors, or anyone else involved in the creation, production, or 
+-- delivery of the scripts be liable for any damages whatsoever (including, 
+-- without limitation, damages for loss of business profits, business interruption, 
+-- loss of business information, or other pecuniary loss) arising out of the use 
+-- of or inability to use the sample scripts or documentation, even if Microsoft 
+-- has been advised of the possibility of such damages 
+--------------------------------------------------------------------------------- 
+
+ 
+SET NOCOUNT ON;
+SET ANSI_WARNINGS OFF;	-- to ignore null value message of sys.dm_hadr_availability_group_states (when it has data)
+DECLARE @ConsoleMsg VARCHAR(1000);
+USE master;	-- to ensure script runs in context of database that is online.
+
+SET @ConsoleMsg = 'Starting AlwaysOn script. DateTime is ' + CONVERT(VARCHAR(24), GETDATE(), 121) 
+	+ ' (' + CONVERT(VARCHAR(24), GETUTCDATE(), 121) + ' UTC).';
+RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT; 
+
+SET @ConsoleMsg = 'Script running on SQL Server with MajorVersion ';
+DECLARE @MajorVersion int;
+SET @MajorVersion = CONVERT(int, SUBSTRING(
+	CONVERT(VARCHAR(128), SERVERPROPERTY('ProductVersion'))
+	, 0
+	, CHARINDEX('.', CONVERT(VARCHAR(128), SERVERPROPERTY('ProductVersion'))) ));
+SET @ConsoleMsg = @ConsoleMsg + CONVERT(VARCHAR(2), @MajorVersion) + '. ';
+IF CONVERT(INT, @MajorVersion) < 11
+BEGIN
+	SET @ConsoleMsg= @ConsoleMsg + 'SQL Server connected to is not SQL Server 2012. Exiting.';
+	RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+	SET NOEXEC ON;	-- do not execute TSQL further below (avoiding complex-looking IF...ELSE code)
+END;
+RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+
+SET @ConsoleMsg = 'Script running on SQL instance '
+	+ CONVERT(nvarchar(256), SERVERPROPERTY('ServerName')) + ' (' + CONVERT(nvarchar(128), SERVERPROPERTY('ProductVersion')) 
+	+ ' ' + SUBSTRING(@@VERSION, CHARINDEX('X', @@VERSION), 3) + ' ';
+-- IIF not in earlier SQL versions so using IF.
+ IF(SERVERPROPERTY('IsClustered') = 1) 
+	SET @ConsoleMsg = @ConsoleMsg + 'SQLIsClustered' 
+ELSE 
+	SET @ConsoleMsg = @ConsoleMsg + 'SQLNotClustered';
+SET @ConsoleMsg = @ConsoleMsg + ').';
+RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+
+SET @ConsoleMsg = 'SQL instance running on computer '
+	+ CONVERT(nvarchar(128), SERVERPROPERTY('ComputerNamePhysicalNetBIOS')) + '.';
+RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+
+IF NOT EXISTS (SELECT 1 FROM sys.availability_groups)
+BEGIN
+	SET @ConsoleMsg = 'No configured Availability Groups in this SQL instance.';
+	RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+END
+DECLARE @AGName sysname;
+DECLARE CurAGs CURSOR
+	FOR SELECT name FROM sys.availability_groups;
+OPEN CurAGs;
+FETCH NEXT FROM CurAGs INTO @AGName;
+WHILE @@FETCH_STATUS = 0
+BEGIN
+
+	DECLARE @AGListener nvarchar(63);
+	SET @AGListener = '';	-- for next loop if any
+	SELECT TOP 1 @AGListener = dns_name FROM sys.availability_group_listeners agl 
+		JOIN sys.availability_groups ag ON agl.group_id = ag.group_id WHERE ag.name = @AGName;
+	SELECT @AGListener = (CASE WHEN @AGListener IS NULL OR @AGListener = '' THEN 'NoListener' ELSE @AGListener END);
+
+	SET @ConsoleMsg = '|- AvailabilityGroupName: ';
+	SELECT @ConsoleMsg = @ConsoleMsg + ag.name 
+		+ ' | FailureConditionLevel: ' + CONVERT(char(1), ag.failure_condition_level)
+		+ ' | HealthCheckTimeoutMilliSecs: ' + CONVERT(varchar(10), ag.health_check_timeout) 
+		+ ' | AutomatedBackupPreference: ' + ag.automated_backup_preference_desc 
+		+ ' | AvailabilityGroupListener: ' + @AGListener
+		FROM sys.availability_groups ag WHERE ag.name = @AGName;
+	RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+
+	DECLARE @DatabaseId int;
+	DECLARE CurDatabases CURSOR
+		FOR SELECT drs.database_id FROM sys.availability_groups ag JOIN sys.dm_hadr_database_replica_states drs 
+		ON ag.group_id = drs.group_id WHERE ag.name = @AGName 
+		GROUP BY ag.name, drs.database_id;
+	OPEN CurDatabases;
+	FETCH NEXT FROM CurDatabases INTO @DatabaseId;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SELECT @ConsoleMsg = '    |- DatabaseName: ' + DB_NAME(drs.database_id) 
+			+ ' | DatabaseIdentifierInAvailabilityGroup: ' + CONVERT(varchar(36), drs.group_database_id) 
+			FROM sys.availability_groups ag JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id 
+			WHERE ag.name = @AGName AND drs.database_id = @DatabaseId 
+			GROUP BY ag.name, drs.database_id, drs.group_database_id;
+		RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+		FETCH NEXT FROM CurDatabases INTO @DatabaseId;
+	END;
+	CLOSE CurDatabases;
+	DEALLOCATE CurDatabases;
+
+	DECLARE @ReplicaName nvarchar(256);
+	DECLARE CurReplicas CURSOR
+		FOR SELECT ar.replica_server_name FROM sys.availability_groups ag 
+			JOIN sys.availability_replicas ar ON ag.group_id = ar.group_id WHERE ag.name = @AGName;
+	OPEN CurReplicas;
+	FETCH NEXT FROM CurReplicas INTO @ReplicaName;
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+		SELECT @ConsoleMsg = '    |- ReplicaName: ' + ar.replica_server_name 
+			+ ' | AvailabilityMode: ' + ar.availability_mode_desc + ' | FailoverMode: ' + ar.failover_mode_desc 
+			+ ' | PrimaryRole: ' + ar.primary_role_allow_connections_desc + ' | SecondaryRole: ' + ar.secondary_role_allow_connections_desc
+			+ ' | JoinState: ' + rcs.join_state_desc
+			+ ' | ClusterNodeName: ' + rcn.node_name
+			FROM sys.availability_groups ag JOIN sys.availability_replicas ar ON ag.group_id = ar.group_id
+			JOIN sys.dm_hadr_availability_replica_cluster_states rcs ON (rcs.group_id = ag.group_id AND rcs.replica_id = ar.replica_id)
+			JOIN sys.dm_hadr_availability_replica_cluster_nodes rcn ON (rcn.group_name=ag.name AND rcn.replica_server_name=ar.replica_server_name)
+			WHERE ag.name = @AGName AND ar.replica_server_name = @ReplicaName;
+		RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;
+		FETCH NEXT FROM CurReplicas INTO @ReplicaName;
+	END;
+	CLOSE CurReplicas;
+	DEALLOCATE CurReplicas;
+	
+	FETCH NEXT FROM CurAGs INTO @AGName;
+END;
+CLOSE CurAGs;
+DEALLOCATE CurAGs;
+
+IF CONVERT(INT, @MajorVersion) < 11
+BEGIN
+	SET NOEXEC OFF;	-- turn on execution for earlier SQL versions to print script complete
+END;
+SET @ConsoleMsg = 'Script complete.';
+RAISERROR (@ConsoleMsg,10,1) WITH NOWAIT;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>workerThreadStarvation</Title>
+      <Shortcut>workerThreadStarvation</Shortcut>
+      <Description>Check for Worker Thread Starvation in an availability group</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @maxWorkerCount AS float, @workerCount AS float
+SELECT @maxWorkerCount = CAST(max_workers_count AS float) FROM sys.dm_os_sys_info AS dosi
+SELECT @workerCount = CAST(COUNT(1) AS float) FROM sys.dm_os_workers AS dow
+
+SELECT PctOfWorkers = @workerCount / @maxWorkerCount -- Should be well below 100%]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

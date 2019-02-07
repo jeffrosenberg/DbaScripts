@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ShrinkTempDB</Title>
+      <Shortcut>ShrinkTempDB</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [tempdb]
+GO
+-- Clear to avoid restart
+DBCC FREESYSTEMCACHE ('ALL')
+DBCC FREEPROCCACHE
+GO
+
+-- Update file size setting
+ ALTER DATABASE tempdb MODIFY FILE
+   (NAME = 'tempdev', SIZE = 18500) 
+ ALTER DATABASE tempdb MODIFY FILE
+   (NAME = 'tempdev2', SIZE = 18500) 
+ ALTER DATABASE tempdb MODIFY FILE
+   (NAME = 'tempdev3', SIZE = 18500) 
+ ALTER DATABASE tempdb MODIFY FILE
+   (NAME = 'tempdev4', SIZE = 18500) 
+   
+-- Shrink file to expected/new size 
+DBCC SHRINKFILE (N'tempdev' , 18500)
+GO
+USE [tempdb]
+GO
+DBCC SHRINKFILE (N'tempdev2' , 18500)
+GO
+USE [tempdb]
+GO
+DBCC SHRINKFILE (N'tempdev3' , 18500)
+GO
+USE [tempdb]
+GO
+DBCC SHRINKFILE (N'tempdev4' , 18500)
+GO
+
+-- Check TempDB Objects In Use
+select * from tempdb.sys.all_objects
+where is_ms_shipped = 0;
+
+-- Check Sizes
+USE [tempdb]
+SELECT
+	[name]
+	,CONVERT(NUMERIC(10,2),ROUND([size]/128.,2))											AS [Size]
+	,CONVERT(NUMERIC(10,2),ROUND(FILEPROPERTY([name],'SpaceUsed')/128.,2))				AS [Used]
+	,CONVERT(NUMERIC(10,2),ROUND(([size]-FILEPROPERTY([name],'SpaceUsed'))/128.,2))		AS [Unused]
+FROM [sys].[database_files]
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

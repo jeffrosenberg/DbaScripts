@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>numbers</Title>
+      <Shortcut>numbers</Shortcut>
+      <Description>Create strings or sets of numbers</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @val VARCHAR(MAX), @N INT
+SET @val = ''
+SET @N = 100
+
+;WITH cte ( n ) AS ( 
+        SELECT ROW_NUMBER() OVER ( ORDER BY CURRENT_TIMESTAMP )
+          FROM sys.objects ) 
+ 
+--SELECT @val = @val + '[PRIMARY], '
+SELECT @val = @val + '{' + CONVERT(VARCHAR, n-1) + '}, '
+--SELECT @val = @val + CONVERT(VARCHAR, n-1) + ','
+--SELECT @val = @val + CONVERT(VARCHAR, n) + ','
+FROM cte
+WHERE n <= @N	
+
+
+SELECT SUBSTRING(@val, 1, LEN(@val)-1)
+
+SELECT n
+      FROM ( SELECT ROW_NUMBER() OVER ( ORDER BY object_id )
+               FROM sys.objects ) D ( n )
+     WHERE n <= 500 ;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

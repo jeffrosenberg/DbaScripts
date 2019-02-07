@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>logReuseWait</Title>
+      <Shortcut>logReuseWait</Shortcut>
+      <Description>Show log reuse wait descriptions, along with a few other database details</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT name, database_id, create_date,
+     compatibility_level, user_access_desc, is_cdc_enabled,
+     state_desc, recovery_model_desc, log_reuse_wait_desc
+FROM sys.databases]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

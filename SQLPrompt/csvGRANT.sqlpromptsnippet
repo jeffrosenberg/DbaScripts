@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>csvGRANT</Title>
+      <Shortcut>csvGRANT</Shortcut>
+      <Description>Grant permissions for ODS public views</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT 'GRANT SELECT ON [' + s.name + '].[' + v.name + '] TO [user_' + s.NAME + ']'
+FROM 
+	sys.views v 
+	INNER JOIN sys.schemas AS s 
+		ON v.schema_id = s.schema_id
+WHERE s.name != 'Internal']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

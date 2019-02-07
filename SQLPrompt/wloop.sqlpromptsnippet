@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>wloop</Title>
+      <Shortcut>wloop</Shortcut>
+      <Description>While Loop</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @i INT
+DECLARE @max INT
+SET @i = 1
+SET @max = (SELECT MAX(pk) FROM #tmpCalls)
+WHILE @i < = @max
+BEGIN
+
+	SET @i = @i + 1
+END]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sel</Title>
+      <Shortcut>sel</Shortcut>
+      <Description>Select Top 10</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>schema</ID>
+          <ToolTip />
+          <Default>dbo</Default>
+        </Literal>
+        <Literal>
+          <ID>table</ID>
+          <ToolTip />
+          <Default>Customers</Default>
+        </Literal>
+        <Literal>
+          <ID>criteria</ID>
+          <ToolTip />
+          <Default>1=1</Default>
+        </Literal>
+        <Literal>
+          <ID>idField</ID>
+          <ToolTip />
+          <Default>CustomerID</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT TOP 10 *
+FROM $schema$.$table$
+WHERE $criteria$
+ORDER BY $idField$ DESC ]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>clearWaitStats</Title>
+      <Shortcut>clearWaitStats</Shortcut>
+      <Description>Clear wait stats using SQLPERF</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DBCC SQLPERF("sys.dm_os_wait_stats" , CLEAR)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

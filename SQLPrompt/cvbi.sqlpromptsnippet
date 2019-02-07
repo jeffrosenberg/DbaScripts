@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cvbi</Title>
+      <Shortcut>cvbi</Shortcut>
+      <Description>Add Convert Large Integer fragment</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[CAST(y AS BIGINT)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

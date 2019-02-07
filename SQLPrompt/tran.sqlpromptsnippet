@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>tran</Title>
+      <Shortcut>tran</Shortcut>
+      <Description>Wrap in a transaction</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[BEGIN TRAN
+
+	$SELECTEDTEXT$
+
+ROLLBACK
+--COMMIT]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

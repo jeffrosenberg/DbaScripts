@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>fastCountByTable</Title>
+      <Shortcut>fastCountByTable</Shortcut>
+      <Description>Get row counts for all tables using partition stats</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT [schema] = s.name, [table] = t.name
+, [Rows] = SUM(p.row_count)
+FROM sys.tables AS t
+INNER JOIN sys.schemas AS s
+  ON s.schema_id = t.schema_id
+INNER JOIN sys.dm_db_partition_stats AS p
+  ON p.object_id = t.object_id
+    AND p.index_id <= 1
+WHERE t.name LIKE '%$CURSOR$%'
+GROUP BY s.name, t.name
+ORDER BY [schema], [table]]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

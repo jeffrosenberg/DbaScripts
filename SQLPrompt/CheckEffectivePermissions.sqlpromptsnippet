@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckEffectivePermissions</Title>
+      <Shortcut>CheckEffectivePermissions</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <Database Name, SYSNAME, MyDB1>
+EXECUTE AS USER = '<Domain User, SYSNAME, MyDomain\MyUserName>';
+SELECT * FROM fn_my_permissions(NULL, 'SERVER') 
+SELECT * FROM fn_my_permissions(NULL, 'DATABASE') 
+ORDER BY subentity_name, permission_name ;  
+REVERT;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

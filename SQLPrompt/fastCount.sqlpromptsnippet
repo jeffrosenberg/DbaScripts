@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>fastCount</Title>
+      <Shortcut>fastCount</Shortcut>
+      <Description>Get a fast count using partition stats</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>TableName</ID>
+          <ToolTip />
+          <Default>MEMBER</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT [Rows] = SUM(row_count)
+FROM sys.dm_db_partition_stats
+WHERE object_id=OBJECT_ID('$TableName$')   
+AND (index_id=0 or index_id=1);]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

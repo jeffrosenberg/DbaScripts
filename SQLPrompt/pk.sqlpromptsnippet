@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>pk</Title>
+      <Shortcut>pk</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[CONSTRAINT [PK_tablename] PRIMARY KEY CLUSTERED 
+(
+	[column1] ASC,
+	[column2] DESC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [psLuxDateKeys]([TRANSACTION_DATE_KEY])
+) ON [psPartitionScheme]([partitionkeycolumn])
+-- ON [PRIMARY]]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

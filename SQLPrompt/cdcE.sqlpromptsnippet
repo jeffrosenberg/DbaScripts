@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cdcE</Title>
+      <Shortcut>cdcE</Shortcut>
+      <Description>Enable CDC table example</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[EXEC sys.sp_cdc_enable_table 
+	'schema'
+	, 'table'
+	, 'table'		/* capture instance name */
+	, @supports_net_changes = 0
+	, @role_name = NULL]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

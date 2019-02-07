@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>deadlockGraph2008</Title>
+      <Shortcut>deadlockGraph2008</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- 2008 and earlier
+SELECT  CAST(event_data.value('(event/data/value)[1]',
+                               'varchar(max)') AS XML) AS DeadlockGraph
+FROM    ( SELECT    XEvent.query('.') AS event_data
+          FROM      (    -- Cast the target_data to XML 
+                      SELECT    CAST(target_data AS XML) AS TargetData
+                      FROM      sys.dm_xe_session_targets st
+                                JOIN sys.dm_xe_sessions s
+                                 ON s.address = st.event_session_address
+                      WHERE     name = 'system_health'
+                                AND target_name = 'ring_buffer'
+                    ) AS Data -- Split out the Event Nodes 
+                    CROSS APPLY TargetData.nodes('RingBufferTarget/
+                                     event[@name="xml_deadlock_report"]')
+                    AS XEventData ( XEvent )
+        ) AS tab ( event_data )
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

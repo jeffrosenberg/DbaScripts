@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckSqlAgentServiceStatus</Title>
+      <Shortcut>CheckSqlAgentServiceStatus</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @agent NVARCHAR(512);
+
+SELECT @agent = COALESCE(N'SQLAgent$' + CONVERT(SYSNAME, SERVERPROPERTY('InstanceName')), 
+  N'SQLServerAgent');
+
+EXEC master.dbo.xp_servicecontrol 'QueryState', @agent;
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

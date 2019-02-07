@@ -1,0 +1,74 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AG_ConfigureReadOnlyRouting</Title>
+      <Shortcut>AG_ConfigureReadOnlyRouting</Shortcut>
+      <Description>Configure read-only routing</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>listener</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>node01</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>node02</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[-------------------------------------------------------------------------------
+-- Configure read-only routing
+
+USE [master]
+
+ALTER AVAILABILITY GROUP [$listener$]
+ MODIFY REPLICA ON
+N'$node01$' WITH 
+(PRIMARY_ROLE (ALLOW_CONNECTIONS = READ_WRITE));
+ALTER AVAILABILITY GROUP [$listener$]
+ MODIFY REPLICA ON
+N'$node01$' WITH 
+(SECONDARY_ROLE (ALLOW_CONNECTIONS = ALL));
+ALTER AVAILABILITY GROUP [$listener$]
+ MODIFY REPLICA ON
+N'$node01$' WITH 
+(SECONDARY_ROLE (READ_ONLY_ROUTING_URL = N'TCP://$node01$.yosemite.local:1433'));
+
+ALTER AVAILABILITY GROUP [$listener$]
+ MODIFY REPLICA ON
+N'$node02$' WITH 
+(PRIMARY_ROLE (ALLOW_CONNECTIONS = READ_WRITE));
+ALTER AVAILABILITY GROUP [$listener$]
+ MODIFY REPLICA ON
+N'$node02$' WITH 
+(SECONDARY_ROLE (ALLOW_CONNECTIONS = ALL));
+ALTER AVAILABILITY GROUP [$listener$]
+ MODIFY REPLICA ON
+N'$node02$' WITH 
+(SECONDARY_ROLE (READ_ONLY_ROUTING_URL = N'TCP://$node02$.yosemite.local:1433'));
+
+ALTER AVAILABILITY GROUP [$listener$] 
+MODIFY REPLICA ON
+N'$node01$' WITH 
+(PRIMARY_ROLE (READ_ONLY_ROUTING_LIST=('$node02$','$node01$')));
+
+ALTER AVAILABILITY GROUP [$listener$] 
+MODIFY REPLICA ON
+N'$node02$' WITH 
+(PRIMARY_ROLE (READ_ONLY_ROUTING_LIST=('$node01$','$node02$')));
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

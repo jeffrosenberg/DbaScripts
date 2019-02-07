@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>queryOptimizerInfo</Title>
+      <Shortcut>queryOptimizerInfo</Shortcut>
+      <Description>System DMV sys.dm_exec_query_optimizer_info</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- List of counters: https://msdn.microsoft.com/en-us/library/ms175002.aspx?f=255&MSPPError=-2147217396
+-- All occurrence values are cumulative and are set to 0 at system restart. All values for value fields 
+-- are set to NULL at system restart. All value-column values that specify an average use the occurrence 
+-- value from the same row as the denominator in the calculation of the average. All query optimizations 
+-- are measured when SQL Server determines changes to dm_exec_query_optimizer_info, including both user- 
+-- and system-generated queries. Execution of an already-cached plan does not change values in 
+-- dm_exec_query_optimizer_info, only optimizations are significant.
+SELECT * FROM sys.dm_exec_query_optimizer_info]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

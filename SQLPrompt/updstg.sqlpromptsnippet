@@ -1,0 +1,324 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>updstg</Title>
+      <Shortcut>updstg</Shortcut>
+      <Description>Template for MDB Staging Update Procedure</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [TallyMDBStaging]
+GO
+
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+
+
+-- EXEC [StagingWIP].[UpdateStaging<Target Table Name, String, DiscountTypes>] 3, '2013-11-13 19:54:28.767', 67, 1, NULL
+<Procedure Declaration, ALTER|CREATE, CREATE> PROCEDURE [StagingWip].[UpdateStaging<Target Table Name, String, DiscountTypes>]
+  @BatchLogId INT
+  , @BatchDate DATETIME
+  , @ControlLogId INT
+  , @ExecStmts BIT = 1
+  , @BatchLineIncrement INT
+AS 
+    BEGIN
+    	SET NOCOUNT ON
+		SET ROWCOUNT 0
+		DBCC TRACEON (610) WITH NO_INFOMSGS
+		
+        BEGIN TRY
+        
+			BEGIN TRANSACTION
+			
+			/* HANDLE VARIABLES/PARAM SNIFFING */
+			DECLARE @BLI INT, @BD DATETIME, @CLI INT, @Rejects VARCHAR(MAX), @errors INT, @BrandKey INT, @SQLLogDetailErrorsSchema VARCHAR(MAX), @StagingWipTable VARCHAR(512), @BLINC INT
+			SET @BLI = @BatchLogId
+			SET @BD = @BatchDate
+			SET @CLI = @ControlLogId
+			SET @BLINC = @BatchLineIncrement
+			SET @Rejects = ''
+			SET @BrandKey = (SELECT [Staging].[GetFileBrandKey](@CLI))
+			SELECT 
+				@SQLLogDetailErrorsSchema = CONVERT(VARCHAR(MAX), SQLLogDetailErrorsSchema)
+				, @StagingWipTable = QUOTENAME(StagingSchema) +'.' + QUOTENAME(StagingTable)
+			FROM 
+				Staging.ImportMetadata WITH(NOLOCK)
+			WHERE 
+				DestinationTable = 'Staging.<Target Table Name, String, DiscountTypes>'
+
+			DECLARE @BatchLineEnd INT = (SELECT MAX(BatchLineNumber) FROM StagingWip.<Target Table Name, String, DiscountTypes> WITH(NOLOCK))
+			DECLARE @CurrentBatchLineMin INT = 1
+			DECLARE @CurrentBatchLineMax INT
+  
+  			IF @BLINC IS NULL SET @CurrentBatchLineMax = @BatchLineEnd
+				ELSE SET @CurrentBatchLineMax = @CurrentBatchLineMin + @BLINC          
+
+			/* CREATE TEMP INDEX */
+			IF  NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID(@StagingWipTable) AND name = N'idxTemp')
+			CREATE CLUSTERED INDEX idxTemp ON StagingWIP.<Target Table Name, String, DiscountTypes> (<Key Column List, String (comma-separated), Type, TypeID>)
+					
+			/* UPDATE STATS */
+			UPDATE STATISTICS Staging.<Target Table Name, String, DiscountTypes>
+			UPDATE STATISTICS StagingWIP.<Target Table Name, String, DiscountTypes>
+									
+        	/* TEST FOR ERRORS */
+			IF OBJECT_ID('#Rejects') IS NOT NULL
+			DROP TABLE #Rejects
+
+			-- Dedupe
+			SELECT 
+				<Key Column List, String (comma-separated), Type, TypeID>
+				, 1 AS FailureReason
+				, MAX(BatchLineNumber) BatchLineNumber
+			INTO #Rejects
+			FROM StagingWIP.<Target Table Name, String, DiscountTypes> WITH(NOLOCK)
+			GROUP BY 
+				<Key Column List, String (comma-separated), Type, TypeID>
+			HAVING COUNT(*) > 1
+
+			-- Required Fields
+			INSERT INTO #Rejects 
+				(
+				<Key Column List, String (comma-separated), Type, TypeID>
+				, FailureReason
+				, BatchLineNumber
+				)
+			SELECT 
+				<Key Column List, String (comma-separated), Type, TypeID>
+				, 6 AS FailureReason
+				, BatchLineNumber
+			FROM 
+				StagingWIP.<Target Table Name, String, DiscountTypes> AS sw WITH(NOLOCK)
+			WHERE
+				<Required Field Check List, String, sw.Type IS NULL OR sw.TypeID IS NULL>
+
+			-- File Specific Validation
+			INSERT INTO #Rejects 
+				(
+				<Key Column List, String (comma-separated), Type, TypeID>
+				, FailureReason
+				, BatchLineNumber
+				)
+			SELECT 
+				<Key Column List, String (comma-separated), Type, TypeID>
+				, 23 AS FailureReason
+				, BatchLineNumber
+			FROM 
+				StagingWIP.<Target Table Name, String, DiscountTypes> AS sw WITH(NOLOCK)
+			WHERE
+			<REMINDER LINE A1, Reminder string, *******************************************************>
+			<REMINDER LINE A2, Reminder string, ** ADD ADDITIONAL USE CASE SPECIFIC VALIDATION RULES **>
+			<REMINDER LINE A3, Reminder string, *******************************************************>
+			    
+			-- TEMP INDEX 	
+			-- CREATE INDEX t ON #Rejects (BatchLogID, <Key Column List, String (comma-separated), Type, TypeID>)
+			
+			--	/* LOG ERRORS */
+			--	-- Gen Reject Logs		
+			IF @ExecStmts = 1
+			INSERT INTO [Staging].[ControlLogDetail] WITH(ROWLOCK) (ControlLogId, FailureReasonId, BatchLineNumber, RowKeyDetails)
+			SELECT 
+				@CLI
+				, FailureReason
+				, BatchLineNumber
+				, 	 REPLACE(
+					 REPLACE(
+							@SQLLogDetailErrorsSchema
+							<REMINDER LINE B1, Reminder string, *************************************>
+							<REMINDER LINE B2, Reminder string, ** CHANGE FOLLOWING MATCH KEY LIST **>
+							<REMINDER LINE B3, Reminder string, *************************************>
+							, '{0}', ISNULL(CONVERT(VARCHAR,Type),'NULL'))
+							, '{1}', ISNULL(CONVERT(VARCHAR,TypeID),'NULL'))
+				FROM #Rejects AS r
+
+			-- Log Counts
+			SET @errors = @@ROWCOUNT;
+			IF @errors > 0
+			EXEC Staging.UpdateControlLog 
+				@CLI
+				, NULL								-- leave existing value
+			    , NULL								-- leave existing value
+			    , @errors							-- error count from rejects table (previous stmt)
+			    , 13
+			
+			/* REMOVE ERROR ROWS FROM STAGE TABLE */
+			DELETE sw
+			FROM StagingWIP.<Target Table Name, String, DiscountTypes> sw WITH(ROWLOCK)
+			WHERE EXISTS	(
+							SELECT 
+								1 
+							FROM 
+								#Rejects d 
+							WHERE  
+								<Key Column Reject Join, String, sw.Type = d.Type AND sw.TypeID = d.TypeID>
+							)
+				OR <Key Null Check Logic, String, sw.Type IS NULL OR sw.TypeID IS NULL>
+				
+			/* CLEANUP */
+			DROP TABLE #Rejects
+
+			/* TEST FOR NET CHANGES AND SPLIT PARTITION AS NEEDED */
+			IF (SELECT COUNT(*) FROM StagingWip.<Target Table Name, String, DiscountTypes> WITH(NOLOCK)) > 0
+			EXEC Staging.UpdatePartitionRangeSplit @BLI
+
+			/* FULL RELOAD FILE CHECK FOR CHANGES AND DELETES BY COMPARING STAGING WIP TO LAST STAGING*/
+			INSERT INTO Staging.<Target Table Name, String, DiscountTypes>
+				(
+				<Full Column List, String (comma-separated), Type, TypeID, Description>
+				, BrandKey
+				, BatchLogID
+				, BatchDate
+				, ChangeType
+				)
+			SELECT
+				<Full Column List, String (comma-separated), Type, TypeID, Description>
+				, @BrandKey
+				, @BLI
+				, @BD
+				, 'D'				-- I=Insert & D=Deleted; I includes Updates implied by whether is first record or first after a delete
+			FROM
+					(
+					SELECT
+						StageKey
+						, <Full Column List, String (comma-separated), Type, TypeID, Description>
+						, BrandKey
+						, BatchLogID
+						, BatchDate
+						, ChangeType
+						, MAX(StageKey) OVER (PARTITION BY <Key Column List, String (comma-separated), Type, TypeID>) AS MaxStageKey
+					FROM
+						Staging.<Target Table Name, String, DiscountTypes> t1 WITH(NOLOCK)
+					WHERE 
+						t1.BrandKey = @BrandKey														/* Filter to Brand Key for Current File */
+						AND 
+						NOT EXISTS (
+									SELECT 1
+									FROM StagingWIP.<Target Table Name, String, DiscountTypes> AS t2 WITH(NOLOCK)				/* WIP contains only current Brand records */
+									WHERE 
+										/* Correlate to Outer Key */
+										<Key Column Correlation, String, t1.Type = t2.Type AND t1.TypeID = t2.TypeID>
+									)
+					) X
+			WHERE
+				X.StageKey = X.MaxStageKey															/* Filter to Most Recent from Inner */
+				AND X.ChangeType != 'D'																/* Most Recent Deleted should be ignored */
+
+			/* DROP TEMP INDEX */
+			IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(@StagingWipTable) AND name = N'idxTemp')
+			DROP INDEX idxTemp ON StagingWIP.<Target Table Name, String, DiscountTypes>
+			
+			/* CREATE TEMP INDEX */
+			IF  NOT EXISTS (SELECT 1 FROM sys.indexes WHERE object_id = OBJECT_ID(@StagingWipTable) AND name = N'idxTemp')
+			CREATE CLUSTERED INDEX idxTemp ON StagingWIP.<Target Table Name, String, DiscountTypes> (BatchLineNumber)
+			
+			/* INSERT CHANGES INTO TO TARGET - LOOP THROUGH CONFIGURED NUMBER OF ROWS */
+			WHILE @CurrentBatchLineMin <= @BatchLineEnd
+
+				BEGIN
+			
+					INSERT INTO Staging.<Target Table Name, String, DiscountTypes>
+							(
+							<Full Column List, String (comma-separated), Type, TypeID, Description>
+							, BrandKey
+							, BatchLogID
+							, BatchDate
+							, ChangeType
+							)
+					SELECT 
+						<Full Column List, String (comma-separated), Type, TypeID, Description>
+						, @BrandKey
+						, @BLI
+						, @BD
+						, 'I'				-- I=Insert & D=Deleted; I includes Updates implied by whether is first record or first after a delete
+					FROM 
+						StagingWip.<Target Table Name, String, DiscountTypes> AS t1 WITH(NOLOCK)
+					WHERE
+						BatchLineNumber >= @CurrentBatchLineMin
+						AND BatchLineNumber <= @CurrentBatchLineMax
+						AND NOT EXISTS (
+										/* FULL RELOAD FILE - CHECK FOR EXISTING IDENTICAL ROW - FILTERING TO MOST RECENT */
+										SELECT
+											1
+										FROM
+											   (
+											   SELECT
+												   StageKey
+												   , <Full Column List, String (comma-separated), Type, TypeID, Description>
+												   , BrandKey
+												   , BatchLogID
+												   , BatchDate
+												   , ChangeType
+												   , MAX(StageKey) OVER (PARTITION BY <Key Column List, String (comma-separated), Type, TypeID>) AS MaxStageKey
+												   , CHECKSUM(<Non-Key Column List 1, String (comma-separated), t2.Description>) AS ChangeCheckSum
+											   FROM
+													Staging.<Target Table Name, String, DiscountTypes> t2 WITH(NOLOCK)
+											   WHERE 
+													t2.BrandKey = @BrandKey							/* Filter to Brand Key for Current File */
+													AND 
+													/* Correlate to Outer Key */
+													<Key Column Correlation, String, t1.Type = t2.Type AND t1.TypeID = t2.TypeID>
+											   ) X
+										WHERE
+										X.StageKey = X.MaxStageKey									/* Filter to Most Recent from Inner */
+										AND X.ChangeType != 'D'										/* Most Recent Deleted should be ignored */
+										AND X.ChangeCheckSum = CHECKSUM(<Non-Key Column List 2, String (comma-separated), t1.Description>)				/* Correlate to Outer to Determine Change */
+										)
+					
+				SET @CurrentBatchLineMin = @CurrentBatchLineMax + 1
+				SET @CurrentBatchLineMax = @CurrentBatchLineMax + @BLINC
+										
+			END
+			
+			/* DROP TEMP INDEX */
+			IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(@StagingWipTable) AND name = N'idxTemp')
+			DROP INDEX idxTemp ON StagingWIP.<Target Table Name, String, DiscountTypes>
+			
+			COMMIT; PRINT '<<Committed>>';
+			
+		END TRY
+        BEGIN CATCH
+        
+			IF @@TRANCOUNT > 0
+				BEGIN ROLLBACK; PRINT '<<Rolled Back>>'; END
+			
+            DECLARE @ErrorMessage NVARCHAR(4000);
+			DECLARE @ErrorSeverity INT;
+			DECLARE @ErrorState INT;
+
+			SELECT 
+				@ErrorMessage = ERROR_MESSAGE(),
+				@ErrorSeverity = ERROR_SEVERITY(),
+				@ErrorState = ERROR_STATE();
+
+			-- Use RAISERROR inside the CATCH block to return error
+			-- information about the original error that caused
+			-- execution to jump to the CATCH block.
+			RAISERROR (@ErrorMessage, -- Message text.
+					   @ErrorSeverity, -- Severity.
+					   @ErrorState -- State.
+					   );
+
+        END CATCH
+	
+		DBCC TRACEOFF (610) WITH NO_INFOMSGS
+		
+    END
+
+GO
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

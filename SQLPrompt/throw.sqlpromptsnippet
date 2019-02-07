@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>throw</Title>
+      <Shortcut>throw</Shortcut>
+      <Description>Throw Error Up to Caller</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @ErrorMessage NVARCHAR(4000);
+			DECLARE @ErrorSeverity INT;
+			DECLARE @ErrorState INT;
+
+			SELECT 
+				@ErrorMessage = ERROR_MESSAGE(),
+				@ErrorSeverity = ERROR_SEVERITY(),
+				@ErrorState = ERROR_STATE();
+
+			-- Use RAISERROR inside the CATCH block to return error
+			-- information about the original error that caused
+			-- execution to jump to the CATCH block.
+			RAISERROR (@ErrorMessage, -- Message text.
+					   @ErrorSeverity, -- Severity.
+					   @ErrorState -- State.
+					   );]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

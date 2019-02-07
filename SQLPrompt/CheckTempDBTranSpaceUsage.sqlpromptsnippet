@@ -1,0 +1,119 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckTempDBTranSpaceUsage</Title>
+      <Shortcut>CheckTempDBTranSpaceUsage</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[/* REFERENCE: http://blogs.msdn.com/b/deepakbi/archive/2010/04/14/monitoring-tempdb-transactions-and-space-usage.aspx */
+-- Check TempDB size in (MB)
+SELECT  SUM(unallocated_extent_page_count) AS [free pages]
+      , ( SUM(unallocated_extent_page_count) * 1.0 / 128 ) AS [free space in MB]
+	  , SUM(allocated_extent_page_count) AS [used pages]							--- CHOYT Added '2014-10-20'
+      , ( SUM(allocated_extent_page_count) * 1.0 / 128 ) AS [used space in MB]		--- CHOYT Added '2014-10-20'
+	  , SUM(total_page_count) AS [total pages]							--- CHOYT Added '2014-10-20'
+      , ( SUM(total_page_count) * 1.0 / 128 ) AS [total space in MB]		--- CHOYT Added '2014-10-20'
+FROM    sys.dm_db_file_space_usage;
+
+--Check TempDB Spaced used by Version Store
+SELECT  SUM(version_store_reserved_page_count) AS [version store pages used]
+      , ( SUM(version_store_reserved_page_count) * 1.0 / 128 ) AS [version store space in MB]
+FROM    sys.dm_db_file_space_usage;
+
+--Check Longest Transaction
+SELECT  transaction_id
+FROM    sys.dm_tran_active_snapshot_database_transactions
+ORDER BY elapsed_time_seconds DESC; 
+ 
+--Check TempDB session files usage
+SELECT  sys.dm_exec_sessions.session_id AS [SESSION ID]
+      , DB_NAME(dm_db_session_space_usage.database_id) AS [DATABASE Name]
+      , host_name AS [System Name]
+      , program_name AS [Program Name]
+      , login_name AS [USER Name]
+      , status
+      , cpu_time AS [CPU TIME (in milisec)]
+      , total_scheduled_time AS [Total Scheduled TIME (in milisec)]
+      , total_elapsed_time AS [Elapsed TIME (in milisec)]
+      , ( memory_usage * 8 ) AS [Memory USAGE (in KB)]
+      , ( user_objects_alloc_page_count * 8 ) AS [SPACE Allocated FOR USER Objects (in KB)]
+      , ( user_objects_dealloc_page_count * 8 ) AS [SPACE Deallocated FOR USER Objects (in KB)]
+      , ( internal_objects_alloc_page_count * 8 ) AS [SPACE Allocated FOR Internal Objects (in KB)]
+      , ( internal_objects_dealloc_page_count * 8 ) AS [SPACE Deallocated FOR Internal Objects (in KB)]
+      , CASE is_user_process
+          WHEN 1 THEN 'user session'
+          WHEN 0 THEN 'system session'
+        END AS [SESSION Type]
+      , row_count AS [ROW COUNT]
+FROM    sys.dm_db_session_space_usage
+        INNER JOIN sys.dm_exec_sessions ON sys.dm_db_session_space_usage.session_id = sys.dm_exec_sessions.session_id
+
+--Check Long running transaction preventing cleanup
+SELECT 
+	  session_id																		--- CHOYT Added '2014-10-20'
+	  , dm_tran_active_transactions.transaction_id AS [Transacton ID]					--- CHOYT Modified '2014-10-20' to use alias because of new join		
+      , [name] AS [TRANSACTION Name]
+      , transaction_begin_time AS [TRANSACTION BEGIN TIME]
+      , DATEDIFF(mi, transaction_begin_time, GETDATE()) AS [Elapsed TIME (in MIN)]
+      , CASE transaction_type
+          WHEN 1 THEN 'Read/write'
+          WHEN 2 THEN 'Read-only'
+          WHEN 3 THEN 'System'
+          WHEN 4 THEN 'Distributed'
+        END AS [TRANSACTION Type]
+      , CASE transaction_state
+          WHEN 0
+          THEN 'The transaction has not been completely initialized yet.'
+          WHEN 1
+          THEN 'The transaction has been initialized but has not started.'
+          WHEN 2 THEN 'The transaction is active.'
+          WHEN 3
+          THEN 'The transaction has ended. This is used for read-only transactions.'
+          WHEN 4
+          THEN 'The commit process has been initiated on the distributed transaction. This is for distributed transactions only. The distributed transaction is still active but further processing cannot take place.'
+          WHEN 5
+          THEN 'The transaction is in a prepared state and waiting resolution.'
+          WHEN 6 THEN 'The transaction has been committed.'
+          WHEN 7 THEN 'The transaction is being rolled back.'
+          WHEN 8 THEN 'The transaction has been rolled back.'
+        END AS [TRANSACTION Description]
+FROM    sys.dm_tran_active_transactions
+	INNER JOIN sys.dm_tran_session_transactions 					--- CHOYT Added '2014-10-20'
+		ON dm_tran_session_transactions.transaction_id = dm_tran_active_transactions.transaction_id
+
+--Check Long running queries
+SELECT  host_name AS [System Name]
+      , program_name AS [Application Name]
+      , DB_NAME(sys.dm_exec_requests.database_id) AS [DATABASE Name]
+      , USER_NAME(user_id) AS [USER Name]
+      , connection_id AS [CONNECTION ID]
+      , sys.dm_exec_requests.session_id AS [CURRENT SESSION ID]
+      , blocking_session_id AS [Blocking SESSION ID]
+      , start_time AS [Request START TIME]
+      , sys.dm_exec_requests.status AS [Status]
+      , command AS [Command Type]
+      , ( SELECT    text
+          FROM      sys.dm_exec_sql_text(sql_handle)
+        ) AS [Query TEXT]
+      , wait_type AS [Waiting Type]
+      , wait_time AS [Waiting Duration]
+      , wait_resource AS [Waiting FOR Resource]
+      , sys.dm_exec_requests.transaction_id AS [TRANSACTION ID]
+      , percent_complete AS [PERCENT Completed]
+      , estimated_completion_time AS [Estimated COMPLETION TIME (in mili sec)]
+      , sys.dm_exec_requests.cpu_time AS [CPU TIME used (in mili sec)]
+      , ( memory_usage * 8 ) AS [Memory USAGE (in KB)]
+      , sys.dm_exec_requests.total_elapsed_time AS [Elapsed TIME (in mili sec)]
+FROM    sys.dm_exec_requests
+        INNER JOIN sys.dm_exec_sessions ON sys.dm_exec_requests.session_id = sys.dm_exec_sessions.session_id
+WHERE   DB_NAME(sys.dm_exec_requests.database_id) = 'tempdb']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AG_Join</Title>
+      <Shortcut>AG_Join</Shortcut>
+      <Description>Join a database to an availability group</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE master 
+GO 
+
+--Primary
+ALTER AVAILABILITY GROUP [dlbsql-p01] ADD DATABASE darden;
+
+--Secondary
+ALTER DATABASE darden SET HADR AVAILABILITY GROUP = [dlbsql-p01];
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

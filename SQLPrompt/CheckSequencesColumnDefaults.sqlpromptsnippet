@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckSequencesColumnDefaults</Title>
+      <Shortcut>CheckSequencesColumnDefaults</Shortcut>
+      <Description>Checks sequences relative to current values where used as default</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <Databasename, SYSNAME, TallyMDBIntegration>
+GO
+DECLARE @Execute BIT = 1
+DECLARE @FilterMismatch BIT = 1
+DECLARE @Stmts TABLE (TempKey INT IDENTITY(1,1), Stmt VARCHAR(MAX))
+INSERT INTO @Stmts
+SELECT 'SELECT ''' + REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ''' AS SequenceName, (SELECT MAX(' + REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ') FROM ' + OBJECT_NAME(object_id) + ') AS TableValue, (SELECT current_value FROM sys.sequences WHERE name = ''' +  REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ''') AS SequenceValue ' 
+	+
+	', ''ALTER SEQUENCE ' + REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ' RESTART WITH '' + CONVERT(VARCHAR(50),(SELECT MAX(' + REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ') FROM ' + OBJECT_NAME(object_id) + ')+1) AS AlterSequenceStatement ' 
+	+
+	CASE WHEN @FilterMismatch = 1
+		 THEN 'WHERE (SELECT MAX(' + REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ') FROM ' + OBJECT_NAME(object_id) + ')!=(SELECT current_value FROM sys.sequences WHERE name = ''' +  REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') + ''')'
+		 ELSE ''
+	END
+FROM sys.columns 
+WHERE 
+	--OBJECT_DEFINITION(default_object_id) LIKE '%TransactionSourceKey%'
+	REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') IN (SELECT name FROM sys.sequences AS s)
+
+--OUTPUT
+IF @Execute = 1
+BEGIN
+	DECLARE @min INT = 1, @Stmt NVARCHAR(MAX) = ''
+	WHILE @min <= (SELECT MAX(TempKey) FROM @Stmts)
+	BEGIN
+		SET @Stmt = (SELECT Stmt FROM @Stmts AS s WHERE TempKey = @min)
+		EXEC sp_executesql @Stmt
+		SET @min+=1
+	END
+END
+ELSE 
+	SELECT * FROM @Stmts AS s]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

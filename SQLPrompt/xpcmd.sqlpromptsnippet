@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>xpcmd</Title>
+      <Shortcut>xpcmd</Shortcut>
+      <Description>Basic declaration for executing a command via xp_cmdshell</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>cmd</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[DECLARE @cmd varchar(4000);
+SET @cmd = '$cmd$';
+
+EXEC xp_cmdshell @cmd;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

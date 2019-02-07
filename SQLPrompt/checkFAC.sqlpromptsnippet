@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>checkFAC</Title>
+      <Shortcut>checkFAC</Shortcut>
+      <Description>Get query for Server-side API Cursor (fetch api cursor) from SAS (or other) for given spid</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @spid INT = 129
+SELECT c.session_id, c.properties, c.creation_time, c.is_open, t.text
+FROM sys.dm_exec_cursors (@spid) c
+CROSS APPLY sys.dm_exec_sql_text (c.sql_handle) t]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

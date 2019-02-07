@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dbUtilSqlTextAndQueryPlan</Title>
+      <Shortcut>dbUtilSqlTextAndQueryPlan</Shortcut>
+      <Description>Get sql text and query plans, searching within the sql text</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT st.PlanHandle
+     , st.PlanDate
+     , Db = DB_NAME(st.dbid)
+     , st.[Text]
+     , qp.QueryPlan
+   --, qs.*
+FROM DBUtilities.logs.SqlText AS st
+LEFT JOIN DBUtilities.logs.QueryPlans AS qp
+  ON qp.PlanHandle = st.PlanHandle
+--LEFT JOIN logs.QueryStats AS qs
+--  ON qs.PlanHandle = qp.PlanHandle
+--    AND qs.CreateDate >= qp.PlanDate
+--    AND QS.CreateDate < DATEADD(day, 1, qp.PlanDate)
+WHERE st.[Text] LIKE '%%']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

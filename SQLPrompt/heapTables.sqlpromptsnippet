@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>heapTables</Title>
+      <Shortcut>heapTables</Shortcut>
+      <Description>Find all tables that are heaps (i.e. no clustered index)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT SCH.name + '.' + TBL.name AS TableName 
+FROM sys.tables AS TBL 
+     INNER JOIN sys.schemas AS SCH 
+         ON TBL.schema_id = SCH.schema_id 
+     INNER JOIN sys.indexes AS IDX 
+         ON TBL.object_id = IDX.object_id 
+            AND IDX.type = 0 -- = Heap 
+ORDER BY TableName]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>tempdb_alloc</Title>
+      <Shortcut>tempdb_alloc</Shortcut>
+      <Description>TempDB allocation by SPID</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT TOP 10 session_id, database_id, user_objects_alloc_page_count + internal_objects_alloc_page_count / 129 AS tempdb_usage_MB, (select TOP 1 loginame from master.dbo.sysprocesses where spid = session_id) AS login_name
+FROM sys.dm_db_session_space_usage
+ORDER BY user_objects_alloc_page_count + internal_objects_alloc_page_count DESC;
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

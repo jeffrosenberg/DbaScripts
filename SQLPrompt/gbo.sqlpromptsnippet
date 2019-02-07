@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>gbo</Title>
+      <Shortcut>gbo</Shortcut>
+      <Description>GROUP BY and ORDER BY the same field(s)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>Fields</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[GROUP BY $Fields$
+ORDER BY $Fields$]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

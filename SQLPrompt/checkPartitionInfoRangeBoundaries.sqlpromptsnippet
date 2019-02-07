@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>checkPartitionInfoRangeBoundaries</Title>
+      <Shortcut>checkPartitionInfoRangeBoundaries</Shortcut>
+      <Description>Returns allocation of records to partition ranges in first set, returns range boundaries of possible values in second set.</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <DatabaseName, SYSNAME, AmtrakMarketing>
+GO
+SELECT $PARTITION.<PartitionFunctionName, SYSNAME, pfPromoCommunications>(<PartitionKey, SYSNAME, CommunicationID>) AS Partition, COUNT(1) PartitionRecordCount, MIN(<PartitionKey, SYSNAME, CommunicationID>) AS MinPartitionDataValue, MAX(<PartitionKey, SYSNAME, CommunicationID>) AS MaxPartitionDataValue FROM <SchemaTableName, SYSNAME, dbo.MemberOffer>
+GROUP BY $PARTITION.<PartitionFunctionName, SYSNAME, pfPromoCommunications>(<PartitionKey, SYSNAME, CommunicationID>) 
+ORDER BY Partition ;
+
+; WITH cteBoundaries AS 
+	(
+	SELECT DISTINCT	ps.name AS PSName
+		  , dds.destination_id AS PartitionNumber
+		  , fg.Name AS FileGroupName
+		  , CONVERT(<PartitionKeyDataType, SYSNAME, INT>, prv.value) AS RangeValue
+	FROM	sys.indexes i
+			INNER JOIN sys.partition_schemes ps ON ps.data_space_id = i.data_space_id
+			INNER JOIN sys.destination_data_spaces dds ON dds.partition_scheme_id = ps.data_space_id
+			INNER JOIN sys.filegroups fg ON fg.data_space_id = dds.data_space_id
+			LEFT OUTER JOIN sys.partition_range_values prv ON prv.boundary_id = dds.destination_id
+	WHERE	i.[object_id] = OBJECT_ID('<SchemaTableName, SYSNAME, dbo.MemberOffer>')
+	)
+SELECT c1.PSName
+	  , c1.PartitionNumber
+	  , c1.FileGroupName
+	  , c2.RangeValue AS LowerRangeBoundary
+	  , NULLIF(<ReduceValueByOneForRangeValueType, DDL text, c1.RangeValue - 1>, <NullValueToTest, SQL_VARIANT, 0>) AS UpperRangeBoundary
+	 FROM cteBoundaries c1
+	LEFT OUTER JOIN cteBoundaries c2 ON c1.PSName = c2.PSName AND c2.PartitionNumber = c1.PartitionNumber - 1
+
+
+--ALTER PARTITION FUNCTION <PartitionFunctionName, SYSNAME, pfPromoCommunications>()
+--MERGE RANGE(498)
+--ALTER PARTITION FUNCTION <PartitionFunctionName, SYSNAME, pfPromoCommunications>()
+--MERGE RANGE(499)
+--ALTER PARTITION FUNCTION <PartitionFunctionName, SYSNAME, pfPromoCommunications>()
+--SPLIT RANGE(498)
+--ALTER PARTITION FUNCTION <PartitionFunctionName, SYSNAME, pfPromoCommunications>()
+--SPLIT RANGE(499)
+
+
+--ALTER PARTITION SCHEME psArchivePromoCommunications
+--NEXT USED fgArchiveCommunications
+--ALTER PARTITION SCHEME psPromoCommunications
+--NEXT USED [PRIMARY]]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

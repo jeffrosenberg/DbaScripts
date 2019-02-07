@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ColumnStoreTest</Title>
+      <Shortcut>ColumnStoreTest</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--CREATE TABLE factTest (factkey INT IDENTITY(1,1) PRIMARY KEY, OrderDateKey INT, DueDateKey INT, ShipDateKey INT)
+--TRUNCATE TABLE factTest
+
+--;WITH cteNums
+--AS
+--(
+--SELECT TOP 144 ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) AS testkey FROM sysobjects
+--)
+--INSERT INTO factTest
+--SELECT * FROM cteNums c1
+-- CROSS APPLY cteNums c2
+-- CROSS APPLY cteNums c3
+
+/****************************************************************************/
+-- Try changing column store index to single or all columns and verify plan 
+-- impact to both build index and queries out
+/****************************************************************************/
+SELECT DISTINCT OrderDateKey FROM factTest	-- SHOULD CLUSTERED INDEX SCAN
+GO
+
+CREATE INDEX ix ON factTest (OrderDateKey) INCLUDE (factkey, duedatekey, shipdatekey)
+GO
+SELECT DISTINCT OrderDateKey FROM factTest	-- SHOULD INDEX SCAN
+GO
+DROP INDEX ix ON factTest 
+GO
+
+ CREATE NONCLUSTERED COLUMNSTORE INDEX csi
+ON factTest
+(OrderDateKey
+	, DueDateKey
+	, ShipDateKey
+	)
+WITH (--DROP_EXISTING =  ON, 
+    MAXDOP = 2)
+ON "default"
+GO
+SELECT DISTINCT factkey FROM factTest			--SHOULD CLUSTERED SCAN
+SELECT DISTINCT OrderDateKey FROM factTest		--SHOULD COLUMNSTORE SCAN
+SELECT DISTINCT DueDateKey FROM factTest		--SHOULD COLUMNSTORE SCAN
+GO
+DROP INDEX csi ON factTest]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

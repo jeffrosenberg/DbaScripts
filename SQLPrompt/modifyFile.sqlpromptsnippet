@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>modifyFile</Title>
+      <Shortcut>modifyFile</Shortcut>
+      <Description>Modify a database file</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[ALTER DATABASE [$DBNAME$]
+MODIFY FILE
+( 
+  NAME = N''
+, FILENAME = ''
+--, SIZE = 
+--, MAXSIZE = 
+--, FILEGROWTH = 
+)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

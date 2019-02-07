@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cdcD</Title>
+      <Shortcut>cdcD</Shortcut>
+      <Description>Disable CDC table example</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[EXEC sys.sp_cdc_disable_table
+    @source_schema = 'schema', -- sysname
+    @source_name = 'table', -- sysname
+    @capture_instance = 'table' -- sysname
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>re_recovery</Title>
+      <Shortcut>re_recovery</Shortcut>
+      <Description>Read Error Logs for Database Recovery Progress</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @DBName VARCHAR(500) = 'AmtrakMarketing'
+DECLARE @DBNameQuoted VARCHAR(500) = '''' + @DBName + ''''
+
+DECLARE @ErrorLog AS TABLE([LogDate] DATETIME, [ProcessInfo] VARCHAR(64), [TEXT] VARCHAR(MAX))
+ 
+INSERT INTO @ErrorLog
+EXEC sys.xp_readerrorlog 0, 1, 'Recovery of database', @DBNameQuoted
+
+INSERT INTO @ErrorLog
+EXEC sys.xp_readerrorlog 0, 1, 'Recovery completed for database', @DBName
+ 
+SELECT TOP 5
+	 [LogDate]
+	, CASE WHEN [TEXT] LIKE '%Completed%' THEN '100%' ELSE SUBSTRING([TEXT], CHARINDEX(') is ', [TEXT]) + 4,CHARINDEX(' complete (', [TEXT]) - CHARINDEX(') is ', [TEXT]) - 4) END AS PercentComplete
+	,CASE WHEN [TEXT] LIKE '%Completed%' THEN  0.00 ELSE CAST(SUBSTRING([TEXT], CHARINDEX('approximately', [TEXT]) + 13,CHARINDEX(' seconds remain', [TEXT]) - CHARINDEX('approximately', [TEXT]) - 13) AS FLOAT)/60.0 END AS MinutesRemaining
+	,CASE WHEN [TEXT] LIKE '%Completed%' THEN  0.00 ELSE CAST(SUBSTRING([TEXT], CHARINDEX('approximately', [TEXT]) + 13,CHARINDEX(' seconds remain', [TEXT]) - CHARINDEX('approximately', [TEXT]) - 13) AS FLOAT)/60.0/60.0 END AS HoursRemaining
+	,[TEXT]
+ 
+FROM @ErrorLog ORDER BY [LogDate] DESC]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

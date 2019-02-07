@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ProductYearEdition</Title>
+      <Shortcut>ProductYearEdition</Shortcut>
+      <Description>Check SQL Product Year and Edition</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[declare @ProductYear int, @IsEnterprise int
+SELECT @ProductYear = substring(@@Version, 22,4) -- SQL Server Product Year
+SELECT @IsEnterprise = CharIndex('Enterprise', convert(varchar, SERVERPROPERTY('Edition')))
+
+SELECT @ProductYear, @IsEnterprise]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

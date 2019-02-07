@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BackupLogNul</Title>
+      <Shortcut>BackupLogNul</Shortcut>
+      <Description>Unsafely backup logs when unable to set to simple - will lose log recoverability</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[BACKUP LOG <Database, sysname, TallyMDBIntegration> TO DISK='NUL:']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

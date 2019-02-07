@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>xpCmdShellKill</Title>
+      <Shortcut>xpCmdShellKill</Shortcut>
+      <Description>Kill a process launched using xp_cmdshell</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Get Windows Processes Running List
+EXEC sys.xp_cmdshell 'TaskList' -- All tasks
+--EXEC sys.xp_cmdshell 'TaskList /FI "ImageName eq Robocopy.exe"' -- Specific task
+
+-- Kill specific PID from list
+--EXEC sys.xp_cmdshell 'Taskkill /PID ?'
+--EXEC sys.xp_cmdshell 'Taskkill /PID ? /F' -- Forcibly kill
+
+--e.g. if xp_cmdshell session in SQL is running a command like robocopy.exe and the TaskList from first query above returns PID 5312, then the second command could be used to kill that process.
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

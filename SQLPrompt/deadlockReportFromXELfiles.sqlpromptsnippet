@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>deadlockReportFromXELfiles</Title>
+      <Shortcut>deadlockReportFromXELfiles</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Get XEL path
+/*
+SELECT CAST(target_data as xml) AS TargetData 
+FROM sys.dm_xe_session_targets st 
+JOIN sys.dm_xe_sessions s 
+ON s.address = st.event_session_address 
+WHERE name = 'system_health' 
+*/
+
+-- Replace path to XEL files from previous
+SELECT CONVERT(XML, event_data), * FROM sys.fn_xe_file_target_read_file('C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\Log\*.xel', 'C:\Program Files\Microsoft SQL Server\MSSQL12.MSSQLSERVER\MSSQL\Log\metafile.xem', null, null)
+WHERE object_name = 'xml_deadlock_report'
+
+;
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

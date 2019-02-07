@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cqs</Title>
+      <Shortcut>cqs</Shortcut>
+      <Description>Check Queues Sample</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <db>
+GO
+SELECT COUNT(*) FROM <queue schema>.<queuename> WITH(NOLOCK)
+SELECT * FROM  sys.transmission_queue WITH(NOLOCK)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

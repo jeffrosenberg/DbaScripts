@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>DeadlockWithTimestamp</Title>
+      <Shortcut>DeadlockWithTimestamp</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @StartDate DATETIME = '11/19/2015'
+SELECT TOP 2	--REMOVE TOP FOR FULL LIST
+	CONVERT(DATETIME, XEventData.XEvent.value('(./@timestamp)[1]', 'varchar(max)')) AS Timestamp
+	, XEventData.XEvent.value('(data/value)[1]', 'varchar(max)') as DeadlockGraph
+	, XEventData.XEvent.query('.') AS FullEventXml
+FROM
+	(
+		select CAST(target_data as xml) as TargetData
+		FROM sys.dm_xe_session_targets st
+		JOIN sys.dm_xe_sessions s on s.address = st.event_session_address
+		WHERE name = 'system_health'
+	) AS Data
+		CROSS APPLY TargetData.nodes ('//RingBufferTarget/event') AS XEventData (XEvent)
+where 
+	XEventData.XEvent.value('@name', 'varchar(4000)') = 'xml_deadlock_report'
+	AND CONVERT(DATETIME, XEventData.XEvent.value('(./@timestamp)[1]', 'varchar(max)')) BETWEEN @StartDate AND GETDATE()]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

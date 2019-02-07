@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dbUtilGetQueryStats</Title>
+      <Shortcut>dbUtilGetQueryStats</Shortcut>
+      <Description>Get query stats that have been logged to DBUtilities tables</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @mostRecentStats AS datetime;
+SELECT  @mostRecentStats = DATEADD(second, -2, MAX(CreateDate)) FROM DBUtilities.logs.QueryStats AS qs;
+DECLARE @planDate AS datetime = CAST(@mostRecentStats AS date);
+DECLARE @dbName AS sysname = NULL
+
+SELECT TOP 50
+  QueryDatabase =
+  DB_NAME(COALESCE(st.dbid, qp.dbid)) 
+    + ISNULL('..' + OBJECT_NAME(COALESCE(st.objectid, qp.objectid)), '')
+, QueryText = 
+  SUBSTRING(st.[text], qs.StatementStartOffset/2 + 1,
+    (CASE WHEN qs.StatementEndOffset = -1
+        THEN LEN(CONVERT(nvarchar(max), st.[text])) * 2
+        ELSE qs.StatementEndOffset
+        END - qs.StatementStartOffset
+    ) / 2)
+, qs.ExecutionCount
+, qs.ExecutionsPerMinute
+, qs.PlanGenerationNumber
+, qs.LastExecutionTime
+, qp.QueryPlan
+, qs.TotalRows
+, AvgRows = qs.TotalRows/qs.ExecutionCount
+, qs.MinRows
+, qs.MaxRows
+, qs.TotalElapsedTime
+, AvgElapsedTime = qs.TotalElapsedTime/qs.ExecutionCount
+, qs.MinElapsedTime
+, qs.MaxElapsedTime
+, qs.TotalLogicalReads
+, AvgLogicalReads = qs.TotalLogicalReads/qs.ExecutionCount
+, qs.MinLogicalReads
+, qs.MaxLogicalReads
+, qs.TotalLogicalWrites
+, AvgLogicalWrites = qs.TotalLogicalWrites/qs.ExecutionCount
+, qs.MinLogicalWrites
+, qs.MaxLogicalWrites
+, qs.TotalPhysicalReads
+, AvgPhysicalReads = qs.TotalPhysicalReads/qs.ExecutionCount
+, qs.MinPhysicalReads
+, qs.MaxPhysicalReads
+, qs.TotalWorkerTime
+, AvgWorkerTime = qs.TotalWorkerTime/qs.ExecutionCount
+, qs.MinWorkerTime
+, qs.MaxWorkerTime
+FROM DBUtilities.logs.QueryStats AS qs
+LEFT JOIN DBUtilities.logs.QueryPlans AS qp
+  ON qp.PlanHandle = qs.PlanHandle
+    AND qp.PlanDate = CAST(qs.CreateDate AS date)
+LEFT JOIN DBUtilities.logs.SqlText AS st
+  ON st.PlanHandle = qs.PlanHandle
+    AND st.PlanDate = CAST(qs.CreateDate AS date)
+WHERE qp.CreateDate >= @mostRecentStats
+  AND (@dbName IS NULL OR qp.dbid = DB_ID(@dbName) OR qp.id IS NULL)
+ORDER BY 
+  qs.TotalLogicalReads 
+  --qs.TotalWorkerTime
+  --qs.TotalElapsedTime
+  --qs.ExecutionCount
+  --qs.ExecutionsPerMinute
+  --qs.TotalLogicalReads/qs.ExecutionCount
+  --qs.TotalWorkerTime/qs.ExecutionCount
+  --qs.TotalElapsedTime/qs.ExecutionCount
+  --qs.TotalElapsedTime
+  DESC]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>loop</Title>
+      <Shortcut>loop</Shortcut>
+      <Description>Basic While Loop Against Temp Table (Cursor Alternative)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @LoopVar int
+DECLARE @TheTable TABLE (TheKey INT)
+
+-- Add rows to @TheTable or replace with reference to alternative available table
+
+SET @LoopVar = (SELECT MIN(TheKey) FROM @TheTable)
+WHILE @LoopVar is not null
+BEGIN
+  -- Do Stuff with current value of @LoopVar
+
+  --Ok, done, now get the next value
+  SET @LoopVar = (SELECT MIN(TheKey) FROM @TheTable
+    WHERE @LoopVar < TheKey)
+END]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

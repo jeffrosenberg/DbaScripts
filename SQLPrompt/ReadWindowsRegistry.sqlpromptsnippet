@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ReadWindowsRegistry</Title>
+      <Shortcut>ReadWindowsRegistry</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[ DECLARE @datapath varchar(255)
+EXEC master..xp_regread
+'HKEY_LOCAL_MACHINE',
+'SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\CurrentVersion',
+'RegisteredOwner',
+@datapath OUTPUT
+PRINT @datapath]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

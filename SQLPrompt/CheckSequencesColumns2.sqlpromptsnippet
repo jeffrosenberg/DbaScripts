@@ -1,0 +1,91 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckSequencesColumns2</Title>
+      <Shortcut>CheckSequencesColumns2</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[/* VARS */
+DECLARE @PrintSQL BIT = 1
+DECLARE @FixValues BIT = 0
+DECLARE @CurrentRow INT = 1
+DECLARE @TableValue BIGINT = 0
+DECLARE @TableSQL NVARCHAR(MAX) = N''
+DECLARE @TableSQLParam NVARCHAR(MAX) = N'@TableValueOut BIGINT OUTPUT'
+DECLARE @SequenceValue BIGINT = 0
+DECLARE @SequenceSQL NVARCHAR(MAX) = N''
+DECLARE @SequenceSQLParam NVARCHAR(MAX) = N'@SequenceValueOut BIGINT OUTPUT'
+DECLARE @SequenceAlterSQL NVARCHAR(MAX) = N''
+DECLARE @SequenceAlterSQLParam NVARCHAR(MAX) = N''
+
+/* INFO */
+IF OBJECT_ID('tempdb..#SeqInfo') IS NOT NULL DROP TABLE #SeqInfo
+CREATE TABLE #SeqInfo (RowNum INT IDENTITY(1,1), SequenceName SYSNAME, TableName SYSNAME, ColumnName SYSNAME)
+
+INSERT INTO #SeqInfo
+	(
+	SequenceName
+	, TableName
+	, ColumnName
+	)
+SELECT 
+	REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') AS SequenceName, 
+	OBJECT_NAME(object_id) AS TableName,
+	c.name AS ColumnName
+FROM sys.columns AS c WITH(NOLOCK)
+WHERE 
+	--OBJECT_DEFINITION(default_object_id) LIKE '%TransactionSourceKey%'
+	REPLACE(REPLACE(OBJECT_DEFINITION(default_object_id),'(NEXT VALUE FOR [',''),'])','') IN (SELECT name FROM sys.sequences AS s)
+
+/* FIX */
+WHILE @CurrentRow <= (SELECT MAX(rownum) FROM #SeqInfo)
+BEGIN
+	
+	SELECT 
+		@TableSQL = N'SELECT @TableValueOut=MAX(' + ColumnName + ') FROM ' + TableName + ' WITH(NOLOCK) ' 
+		, @SequenceSQL = N'SELECT @SequenceValueOut=CONVERT(BIGINT, current_value) FROM sys.sequences AS s WHERE name=''' + SequenceName + ''''
+		, @SequenceAlterSQL = N'ALTER SEQUENCE ' + SequenceName + ' RESTART WITH @@REPLACE'
+	FROM #SeqInfo AS si WHERE rownum = @CurrentRow
+	
+	IF @PrintSQL = 1
+		BEGIN
+			PRINT @TableSQL + CHAR(13)+CHAR(10)
+			PRINT @SequenceSQL + CHAR(13)+CHAR(10)
+			PRINT @SequenceAlterSQL + CHAR(13)+CHAR(10)
+		END
+	ELSE
+		BEGIN
+			EXECUTE sp_executesql @TableSQL, @TableSQLParam, @TableValueOut=@TableValue OUTPUT;
+			EXECUTE sp_executesql @SequenceSQL, @SequenceSQLParam, @SequenceValueOut=@SequenceValue OUTPUT;
+			PRINT CONVERT(VARCHAR(MAX), ISNULL(@TableValue,0)) + ':' + CONVERT(VARCHAR(MAX), ISNULL(@SequenceValue,0))
+		END
+
+	IF @FixValues = 1 
+	AND ISNULL(@TableValue,0) > ISNULL(@SequenceValue,0)
+	BEGIN
+		SET @SequenceAlterSQL = REPLACE(@SequenceAlterSQL, '@@REPLACE', @TableValue+1)
+		EXECUTE sp_executesql @SequenceAlterSQL, @SequenceAlterSQLParam;
+	END
+
+	SET @TableValue = 0
+	SET @SequenceValue = 0
+	SET @CurrentRow+=1
+END
+
+--ALTER SEQUENCE seqTest RESTART WITH 170
+--ALTER SEQUENCE seqTest2 RESTART WITH 1
+SELECT current_value FROM sys.sequences AS s
+SELECT MAX(PK) FROM tSEQTester
+SELECT MAX(PK) FROM tSEQTester2
+SELECT MAX(PK) FROM tSEQTester3
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

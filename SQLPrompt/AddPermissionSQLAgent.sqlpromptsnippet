@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AddPermissionSQLAgent</Title>
+      <Shortcut>AddPermissionSQLAgent</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [master]
+GO
+/*
+	In sql mgmt studio, to replace template parameters below (e.g. Database Name):
+	
+	press=>  CTRL+SHIFT+M 
+	OR 
+	click=> Query Menu->Specify Values for Template Parameters
+
+*/
+
+-- Add SQL Agent Access
+USE [msdb]
+GO
+CREATE USER [<Domain User, SYSNAME, MyDomain\MyUserName>] FOR LOGIN [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+ALTER ROLE [SQLAgentOperatorRole] ADD MEMBER [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+USE [msdb]
+GO
+ALTER ROLE [SQLAgentReaderRole] ADD MEMBER [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>EnableDisableFKs</Title>
+      <Shortcut>EnableDisableFKs</Shortcut>
+      <Description>Enable and/or Disable all Foriegn Key Constraints</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- Disable all table constraints
+
+ALTER TABLE MyTable NOCHECK CONSTRAINT ALL
+
+-- Enable all table constraints
+
+ALTER TABLE MyTable CHECK CONSTRAINT ALL
+
+-- Disable single constraint
+
+ALTER TABLE MyTable NOCHECK CONSTRAINT MyConstraint
+
+-- Enable single constraint
+
+ALTER TABLE MyTable CHECK CONSTRAINT MyConstraint]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

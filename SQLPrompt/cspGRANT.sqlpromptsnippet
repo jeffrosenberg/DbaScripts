@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cspGRANT</Title>
+      <Shortcut>cspGRANT</Shortcut>
+      <Description>Grant permissions for report stored procedures</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT 'GRANT EXEC ON [' + s.name + '].[' + p.name + '] TO [public]'
+FROM 
+	sys.procedures AS p 
+	INNER JOIN sys.schemas AS s 
+		ON p.schema_id = s.schema_id
+WHERE s.name = 'Reports']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>checkPartitionBoundaries</Title>
+      <Shortcut>checkPartitionBoundaries</Shortcut>
+      <Description>Returns list of partition boundaries given partition function</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[select * from sys.partition_range_values
+ where function_id in (select function_id 
+      from sys.partition_functions
+       where name in ('<PartitionFunctionName, SYSNAME, pfPromoCommunications>'))]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

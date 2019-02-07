@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>xmlDynamicColumns</Title>
+      <Shortcut>xmlDynamicColumns</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--DROP TABLE #ControlLogDetail 
+CREATE TABLE #ControlLogDetail (ResultRows XML)
+INSERT INTO #ControlLogDetail (ResultRows) VALUES ('
+    <ControlLogDetail xmlns:xsd="http://www.w3.org/2001/XMLSchema"        
+                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+       <Row>
+           <RowData FieldName="DateOfBusiness" FieldValue="11/19/2013" />
+           <RowData FieldName="FKStoreID" FieldValue="123" />
+		   <RowData FieldName="CheckNumber" FieldValue="1000001" />
+		   <RowData FieldName="BatchLogId" FieldValue="309" />
+       </Row>
+       <Row>
+           <RowData FieldName="DateOfBusiness" FieldValue="11/20/2013" />
+           <RowData FieldName="FKStoreID" FieldValue="234" />
+		   <RowData FieldName="CheckNumber" FieldValue="1000002" />
+		   <RowData FieldName="BatchLogId" FieldValue="309" />
+       </Row>
+	   <Row>
+           <RowData FieldName="DateOfBusiness" FieldValue="11/21/2013" />
+           <RowData FieldName="FKStoreID" FieldValue="345" />
+		   <RowData FieldName="CheckNumber" FieldValue="1000003" />
+		   <RowData FieldName="BatchLogId" FieldValue="309" />
+       </Row>
+    </ControlLogDetail>')
+
+--SELECT
+--   N.C.value('DateOfBusiness[1]', 'datetime') AS N.C.value('local-name(DateOfBusiness[1])', 'sysname')
+--FROM #ControlLogDetail
+--CROSS APPLY ResultRows.nodes('/ControlLogDetail/Row') N(C)
+
+DECLARE @template AS varchar(MAX)
+SET @template = 'SELECT 
+    {@col_list}
+FROM #ControlLogDetail 
+	CROSS APPLY ResultRows.nodes(''/ControlLogDetail/Row'') AS T(c)
+'
+
+DECLARE @col_template AS varchar(MAX)
+SET @col_template = 'T.c.value(''./RowData[@FieldName="{FieldName}"][1]/@FieldValue'',''varchar(max)'') AS {FieldName}'
+
+DECLARE @col_list AS varchar(MAX)
+
+;WITH FieldNames AS (
+    SELECT DISTINCT FieldName
+    FROM #ControlLogDetail AS cld
+    CROSS APPLY (
+        SELECT X.FieldName.value('@FieldName', 'varchar(255)')
+        FROM ResultRows.nodes('/ControlLogDetail[1]/Row[1]/RowData') AS X(FieldName)
+    ) AS Y (FieldName)
+)
+SELECT @col_list = COALESCE(@col_list + ',', '') + REPLACE(@col_template, '{FieldName}', FieldName)
+FROM FieldNames
+
+DECLARE @sql AS varchar(MAX)
+SET @sql = REPLACE(@template, '{@col_list}', @col_list)
+
+--SELECT @sql
+EXEC (@sql)
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

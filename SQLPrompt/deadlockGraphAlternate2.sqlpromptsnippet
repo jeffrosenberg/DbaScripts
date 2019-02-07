@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>deadlockGraphAlternate2</Title>
+      <Shortcut>deadlockGraphAlternate2</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+-- 2008- Version
+IF OBJECT_ID('tempdb..#t') IS NOT NULL DROP TABLE #t
+		CREATE TABLE #t (PK INT IDENTITY(1,1) PRIMARY KEY, TargetData XML)
+		INSERT INTO #t
+ SELECT CAST(target_data as xml) AS TargetData
+ FROM sys.dm_xe_session_targets st
+ JOIN sys.dm_xe_sessions s
+ ON s.address = st.event_session_address
+ WHERE name = 'system_health'
+ AND st.target_name = 'ring_buffer'
+ 
+CREATE PRIMARY XML INDEX x ON #t(TargetData)
+
+ SELECT XEventData.XEvent.value('(data/value)[1]','VARCHAR(MAX)') AS DeadLockGraph
+ FROM #t
+ CROSS APPLY TargetData.nodes('//RingBufferTarget/event') AS XEventData (XEvent)
+ WHERE XEventData.XEvent.value('@name','varchar(4000)') = 'xml_deadlock_report'
+
+-- 2012+ Version
+IF OBJECT_ID('tempdb..#t') IS NOT NULL DROP TABLE #t
+		CREATE TABLE #t (PK INT IDENTITY(1,1) PRIMARY KEY, TargetData XML)
+		INSERT INTO #t
+SELECT CAST(target_data as xml) AS TargetData 
+FROM sys.dm_xe_session_targets st 
+JOIN sys.dm_xe_sessions s 
+ON s.address = st.event_session_address 
+WHERE name = 'system_health' 
+AND st.target_name = 'ring_buffer'
+
+CREATE PRIMARY XML INDEX x ON #t(TargetData)
+
+SELECT XEventData.XEvent.query('(data/value/deadlock)[1]') AS DeadLockGraph 
+FROM #t 
+CROSS APPLY TargetData.nodes('//RingBufferTarget/event') AS XEventData (XEvent) 
+WHERE XEventData.XEvent.value('@name','varchar(4000)') = 'xml_deadlock_report'
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

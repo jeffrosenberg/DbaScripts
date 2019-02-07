@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>restore_sample</Title>
+      <Shortcut>restore_sample</Shortcut>
+      <Description>Sample of command for restore of full, diff, tran log backups</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [master]
+BACKUP LOG [test] TO  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\test_LogBackup_2013-08-05_16-26-00.bak' WITH NOFORMAT, NOINIT,  NAME = N'test_LogBackup_2013-08-05_14-52-58', NOSKIP, NOREWIND, NOUNLOAD,  NORECOVERY ,  STATS = 5
+GO
+RESTORE DATABASE [test] FROM  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\test.bak' WITH  FILE = 1,  NORECOVERY,  NOUNLOAD,  STATS = 5
+--RESTORE DATABASE [test] FROM  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\test2full.bak' WITH  FILE = 1,  NORECOVERY,  NOUNLOAD,  STATS = 5
+GO
+RESTORE DATABASE [test] FROM  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\testdiff.bak' WITH  FILE = 1,  NORECOVERY, NOUNLOAD,  STATS = 5
+GO
+RESTORE LOG [test] FROM  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\test.trn' WITH  FILE = 1,  NORECOVERY, NOUNLOAD,  STATS = 10
+RESTORE LOG [test] FROM  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\test.trn' WITH  FILE = 1,  NORECOVERY, NOUNLOAD,  BUFFERCOUNT=50, STATS = 10
+RESTORE LOG [test] FROM  DISK = N'C:\Program Files\Microsoft SQL Server\MSSQL10_50.MSSQLSERVER\MSSQL\Backup\test.trn' WITH  FILE = 1,  NORECOVERY, NOUNLOAD,  BUFFERCOUNT=2200, STATS = 10
+GO
+RESTORE DATABASE [test] WITH RECOVERY
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

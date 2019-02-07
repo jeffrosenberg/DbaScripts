@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>compress</Title>
+      <Shortcut>compress</Shortcut>
+      <Description>Compress Table and Indexes for Specified Table</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[ALTER TABLE <Schema Name, SYSNAME, dbo>.<Table Name, SYSNAME, member> REBUILD PARTITION = ALL WITH(ONLINE=<Online Status, VARCHAR, ON | OFF >, DATA_COMPRESSION = <Compression Type, VARCHAR, ROW | PAGE | NONE>)
+ALTER INDEX ALL ON <Schema Name, SYSNAME, dbo>.<Table Name, SYSNAME, member> REBUILD WITH(ONLINE=<Online Status, VARCHAR, ON | OFF >, DATA_COMPRESSION=<Compression Type, VARCHAR, ROW | PAGE | NONE>)
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

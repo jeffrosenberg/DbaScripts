@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>currentSessionStats</Title>
+      <Shortcut>currentSessionStats</Shortcut>
+      <Description>Current session statistics from sys.dm_exec_requests</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT der.session_id
+     , der.start_time
+     , der.logical_reads
+     , der.writes
+     , der.cpu_time
+     , der.total_elapsed_time
+     , der.wait_type
+     , der.wait_time
+     , der.last_wait_type
+     , der.sql_handle
+     , der.plan_handle
+     , der.connection_id
+FROM sys.dm_exec_requests AS der
+WHERE der.session_id = @@SPID]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

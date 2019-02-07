@@ -1,0 +1,75 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>BinaryCharacterConversion</Title>
+      <Shortcut>BinaryCharacterConversion</Shortcut>
+      <Description>Examples</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--Reference: http://sqlmag.com/t-sql/sql-server-2008-s-t-sql-features
+
+-- **********************************************
+-- SQL 2008 and Later
+-- **********************************************
+SELECT
+
+  CONVERT(VARCHAR(20), 0x4775696E6E657373, 1) AS bin_to_char_with_0x_prefix,
+
+  CONVERT(VARCHAR(20), 0x4775696E6E657373, 2) AS bin_to_char_no_prefix;
+
+SELECT
+
+  CONVERT(VARBINARY(10), '0x4775696E6E657373', 1) AS char_with_0x_prefix_to_bin,
+
+  CONVERT(VARBINARY(10), '4775696E6E657373', 2) AS char_no_prefix_to_bin;
+
+SELECT sys.fn_varbintohexstr(0x4775696E6E657373);
+
+SELECT sys.fn_varbintohexsubstring(1,0x4775696E6E657373,1,0);
+
+SELECT OBJECT_DEFINITION(OBJECT_ID('sys.fn_varbintohexsubstring'));
+
+
+-- **********************************************
+--CHAR TO Bin pre-2008 USING dynamic SQL
+-- **********************************************
+DECLARE
+
+  @CHAR AS NVARCHAR(20),
+
+  @bin AS VARBINARY(10),
+
+  @SQL AS NVARCHAR(500);
+
+ 
+
+SET @CHAR = N'0x4775696E6E657373';
+
+ 
+
+SET @SQL = N'SET @result = ' + @CHAR + N';'
+
+ 
+
+EXEC sp_executesql
+
+  @stmt = @SQL,
+
+  @params = N'@result AS VARBINARY(10) OUTPUT',
+
+  @RESULT = @bin OUTPUT;
+
+ 
+
+SELECT @bin;
+
+SELECT dbo.fn_chartobin('0x4775696E6E657373');]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

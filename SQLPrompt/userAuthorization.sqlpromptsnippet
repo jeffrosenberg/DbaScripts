@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>userAuthorization</Title>
+      <Shortcut>userAuthorization</Shortcut>
+      <Description>Try a query as dbo and a specific user to test access/authorization levels</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>db</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>query</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>userToImpersonate</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[USE [$db$]
+GO
+
+SELECT SUSER_NAME();
+$query$
+GO
+
+EXECUTE AS USER = '$userToImpersonate$';
+SELECT SUSER_NAME();
+$query$
+GO
+
+REVERT
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

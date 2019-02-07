@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>VLFSizes</Title>
+      <Shortcut>VLFSizes</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SET NOCOUNT ON
+DECLARE @beginlsn numeric(22,0);
+DECLARE @increment bigINT;
+    SET @increment = 1;
+
+IF (OBJECT_ID('tempdb..#vlf') IS NOT NULL)
+    DROP TABLE #VLF
+
+CREATE TABLE #vlf(fileid int, filesize bigint, startoffset numeric(13,0), fseqno int, status smallint, parity int, createlsn numeric(22,0));
+
+DECLARE @db varchar(128);
+SET @db =  DB_NAME()
+
+INSERT INTO #vlf
+EXEC ('DBCC LOGINFO('''+ @db +''')');
+
+ALTER TABLE #VLF 
+    ADD growIncrement INT,row_id INT IDENTITY(1,1);
+
+SET @beginlsn = (SELECT TOP 1 createlsn
+                 FROM #vlf
+                 WHERE growIncrement is null
+                 ORDER BY startoffset);
+
+-- Set growth increment (shows how many vlfs were created in a single growth)
+WHILE EXISTS(SELECT 1 FROM #vlf WHERE growIncrement is null)
+BEGIN
+    UPDATE #vlf SET growIncrement = @increment WHERE createlsn = @beginlsn;
+    SET @beginlsn = (SELECT TOP 1 createlsn FROM #vlf WHERE growIncrement is null order by startoffset)
+    SET @increment = @increment + 1;
+END
+
+SELECT  fileid,fseqno,status,parity,growincrement,row_id as VLF_Number
+    , (SELECT (SUM(filesize) / 1048576) FROM #vlf v2 WHERE v2.row_id <= v.row_id) as RunningTotalInMB
+	, (SELECT (SUM(filesize) / 1048576) FROM #vlf v2 WHERE v2.row_id <= v.row_id) - (SELECT (SUM(filesize) / 1048576) FROM #vlf v3 WHERE v3.row_id <= v.row_id - 1) GrowthFromPreviousVLF
+FROM #vlf v
+ORDER BY row_id desc]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

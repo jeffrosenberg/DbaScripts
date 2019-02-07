@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cdcTables</Title>
+      <Shortcut>cdcTables</Shortcut>
+      <Description>List CDC tables, columns, and settings</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- List CDC tables, columns, and settings
+SELECT cdc_table = ct.capture_instance
+     , original_schema = OBJECT_SCHEMA_NAME(t.object_id)
+     , original_table = t.name
+     , ct.supports_net_changes
+     , cc.column_name
+     , cc.column_type
+     , cc.column_ordinal
+FROM cdc.captured_columns AS cc
+INNER JOIN cdc.change_tables AS ct
+  ON ct.object_id = cc.object_id
+INNER JOIN sys.tables AS t
+  ON t.object_id = ct.source_object_id
+ORDER BY ct.capture_instance, cc.column_ordinal]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

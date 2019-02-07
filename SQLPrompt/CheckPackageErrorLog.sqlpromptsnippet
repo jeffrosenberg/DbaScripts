@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckPackageErrorLog</Title>
+      <Shortcut>CheckPackageErrorLog</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE TallyMDBUtility
+GO
+SELECT p.PackageName, * FROM SSIS.PackageErrorLog AS pel 
+INNER JOIN ssis.PackageLog AS pl ON pl.PackageLogId = pel.PackageLogId
+INNER JOIN SSIS.PackageVersion AS pv ON pv.PackageVersionId = pl.PackageVersionId
+INNER JOIN SSIS.Package AS p ON p.PackageId = pv.PackageId
+WHERE pel.LogDateTime >='$DATE(MM/dd/yyyy)$'
+ORDER BY PackageErrorLogId DESC]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

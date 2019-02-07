@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>SqlCmdExecScripts</Title>
+      <Shortcut>SqlCmdExecScripts</Shortcut>
+      <Description>SQLCMD Mode method of Executing External Scripts from SQL Management Studio</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE Sandbox
+GO
+
+:setvar path "C:\Junk\"
+
+:r $(path)testfile1.sql
+:r $(path)testfile2.sql]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

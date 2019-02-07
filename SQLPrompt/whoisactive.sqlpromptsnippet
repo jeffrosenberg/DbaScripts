@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>whoisactive</Title>
+      <Shortcut>whoisactive</Shortcut>
+      <Description>sp_WhoIsActive with parameter hints</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[EXEC sp_whoisactive 
+  @show_own_spid = 0
+, @show_sleeping_spids = 1    -- 0: no sleeping spids 
+                              -- 1: open transactions only 
+                              -- 2: all
+, @show_system_spids = 0                                    
+
+--Get additional data: set any of these to collect more info
+, @get_plans = 0              -- 1: gets the plan based on the request's statement offset 
+                              -- 2: gets the entire plan based on the request's plan_handle
+, @get_locks = 0              -- 1: gets associated locks for each request, aggregated in an XML format
+, @get_full_inner_text = 0    -- 0: actual statement that is currently running in the batch or procedure 
+                              -- 1: full stored procedure or running batch
+, @get_outer_command = 1      -- 1: get the associated outer ad hoc query or stored procedure call, if available
+, @get_transaction_info = 0   -- 1: enables pulling transaction log write info and transaction duration
+, @get_task_info = 1          -- 0: no task-related information 
+                              -- 1: lightweight mode that pulls the top non-CXPACKET wait 
+                              -- 2: all available task-based metrics
+, @get_avg_time = 0           -- 1: Get average time for past runs of an active query
+, @get_additional_info = 0    -- 1: Get additional non-performance-related information about the session or request
+
+--Filter: uncomment this pair to include only the specified criteria
+--, @filter_type = 'database' -- program / database / login / host (text filters w/ wildcards) / session (numeric)
+--, @filter = ''
+
+--NOT Filter: uncommend this pair to exclude the specified criteria
+--, @not_filter_type = 'database' -- program / database / login / host (text filters w/ wildcards) / session (numeric)
+--, @not_filter = ''
+
+--Display options: uncomment to tweak the output display
+--, @output_column_list = '[dd hh:mm:ss.mss], [sql_text], [sql_command], [status], [session_id], [blocking_session_id], [wait_info], [locks], [CPU], [used_memory], [physical_reads], [reads], [writes], [open_tran_count], [login_name], [database_name], [query_plan]'  -- List of desired output columns, in desired order (must be delimited by brackets)
+--, @sort_order = ''          -- Column(s) by which to sort output, optionally with sort directions (must be delimited by brackets)
+;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

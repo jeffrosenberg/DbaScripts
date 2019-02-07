@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cvd</Title>
+      <Shortcut>cvd</Shortcut>
+      <Description>Add Convert Datetime fragment</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[CAST(y AS DATETIME)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>FixRecoveryPendingWithInMemory</Title>
+      <Shortcut>FixRecoveryPendingWithInMemory</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--Reference: http://sqlactions.com/2014/07/31/how-to-recovery-database-from-in-memory-table-corruption/
+ALTER DATABASE <DatabaseName, sysname, HyattMigr> SET EMERGENCY
+DBCC CHECKDB ('<DatabaseName, sysname, HyattMigr>')
+alter database <DatabaseName, sysname, HyattMigr> MODIFY file (name = '<In Memory FileGroup Name, sysname, HyattMigr_InMemOltp>',offline)		-- Disable In-Memory by setting its Filegroup Offline in order to Recover Disk-based data
+alter database <DatabaseName, sysname, HyattMigr> SET online]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

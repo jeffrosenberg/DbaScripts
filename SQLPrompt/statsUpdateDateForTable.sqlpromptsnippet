@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>statsUpdateDateForTable</Title>
+      <Shortcut>statsUpdateDateForTable</Shortcut>
+      <Description>Get Statistics Update for Given Table</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT name AS stats_name, 
+    STATS_DATE(object_id, stats_id) AS statistics_update_date
+FROM sys.stats 
+WHERE object_id = OBJECT_ID('membercommunicationemail');]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

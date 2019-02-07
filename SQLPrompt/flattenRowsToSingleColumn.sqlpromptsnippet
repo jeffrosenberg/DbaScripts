@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>flattenRowsToSingleColumn</Title>
+      <Shortcut>flattenRowsToSingleColumn</Shortcut>
+      <Description>Mssqltips suggestions for flatting multiple rows into a list of values in a single column.</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--REFERENCE: http://www.mssqltips.com/sqlservertip/2914/rolling-up-multiple-rows-into-a-single-row-and-column-for-sql-server-data/
+
+--Example 1
+SELECT 
+   SS.SEC_NAME,
+   STUFF((SELECT '; ' + US.USR_NAME 
+          FROM USRS US
+          WHERE US.SEC_ID = SS.SEC_ID
+          FOR XML PATH('')), 1, 1, '') [SECTORS/USERS]
+FROM SALES_SECTORS SS
+GROUP BY SS.SEC_ID, SS.SEC_NAME
+ORDER BY 1
+
+--Example 2
+SELECT 
+   SS.SEC_NAME + ': ' +
+   STUFF((SELECT '; ' + US.USR_NAME 
+          FROM USRS US
+          WHERE US.SEC_ID = SS.SEC_ID
+          FOR XML PATH('')), 1, 1, '') [SECTORS/USERS]
+FROM SALES_SECTORS SS
+GROUP BY SS.SEC_ID, SS.SEC_NAME
+ORDER BY 1
+
+--Example 3
+SELECT 
+    SS.SEC_ID, 
+    SS.SEC_NAME,
+    STUFF((SELECT '; ' + AC.ADV_NAME + ' (' + 
+             STUFF((SELECT ',' + US.USR_NAME
+                    FROM USR_ADV_CAMPAIGN UAC
+                    INNER JOIN USRS US 
+                          ON US.USR_ID = UAC.USR_ID
+                    WHERE UAC.ADV_ID = SAC.ADV_ID
+                    FOR XML PATH('')), 1, 1, '') + ')'
+           FROM ADV_CAMPAIGN AC
+           INNER JOIN SEC_ADV_CAMPAIGN SAC 
+                 ON SAC.ADV_ID = AC.ADV_ID AND SAC.SEC_ID = SS.SEC_ID 
+           ORDER BY AC.ADV_NAME
+           FOR XML PATH('')), 1, 1, '') [CAMPAIGNS/USERS PER SECTOR]
+FROM SALES_SECTORS SS
+GROUP BY 
+     SS.SEC_ID, 
+     SS.SEC_NAME]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

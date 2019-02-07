@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>tablesize</Title>
+      <Shortcut>tablesize</Shortcut>
+      <Description>Get Table and Index Sizes for DB</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <Database Name, SYSNAME, Sandbox>
+GO
+SET NOCOUNT ON
+/*DATABASE TABLE SPY SCRIPT
+ Micheal Soelter
+ 1/24/03
+DESCRIPTION
+ Returns TABLE Size Information 
+SORTING USAGE
+ @Sort bit VALUES
+ 0 = Alphabetically BY TABLE name
+ 1 = Sorted BY total space used by TABLE
+*/
+DECLARE @cmdstr varchar(500)
+DECLARE @Sort bit
+SELECT @Sort = 1 /* Edit this value FOR sorting options */
+/* DO NOT EDIT ANY CODE BELOW THIS LINE */ 
+--Create Temporary Table
+CREATE TABLE #TempTable 
+ (	[Table_Name] varchar(500),
+	Row_Count VARCHAR(500),
+	Table_Size varchar(500),
+	Data_Space_Used varchar(500),
+	Index_Space_Used varchar(500),
+	Unused_Space varchar(500)
+ )
+--Create Stored Procedure String
+ SELECT @cmdstr = 'sp_msforeachtable ''sp_spaceused "?"'''
+--Populate Tempoary Table
+ INSERT INTO #TempTable EXEC(@cmdstr)
+--Determine sorting method
+IF @Sort = 0 
+
+
+     BEGIN 
+     --Retrieve Table Data and Sort Alphabet
+    --     ically
+     SELECT * FROM #TempTable ORDER BY Table_Name
+ END
+ELSE
+
+
+     BEGIN
+     /*Retrieve TABLE Data AND Sort BY the size OF the Table*/
+     SELECT *  FROM #TempTable ORDER BY CONVERT(INT, LEFT(Table_Size, LEN(Table_Size)-3)) DESC
+
+ END
+--Delete Temporay Table
+DROP TABLE #TempTable]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

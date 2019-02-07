@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>SplitParseDelimitedField</Title>
+      <Shortcut>SplitParseDelimitedField</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+DECLARE @delimiter VARCHAR(1) = '|'
+;WITH InputColumns (Col, xmlCols)
+AS
+(
+    SELECT inputdata AS Col,
+    CONVERT(XML,'<Cols><Col>'  
+    + REPLACE(CONVERT(VARCHAR(MAX), inputdata),@delimiter, '</Col><Col>') + '</Col></Cols>') AS xmlCols
+      FROM Hyatt.dbo.BATCH_INPUT_FILE_LINE
+)
+
+ SELECT Col,      
+ xmlCols.value('/Cols[1]/Col[1]','varchar(100)') AS Col1,    
+ xmlCols.value('/Cols[1]/Col[2]','varchar(100)') AS Col2,
+ xmlCols.value('/Cols[1]/Col[3]','varchar(100)') AS Col3,    
+ xmlCols.value('/Cols[1]/Col[4]','varchar(100)') AS Col4,
+ xmlCols.value('/Cols[1]/Col[5]','varchar(100)') AS Col5
+ FROM InputColumns WITH(NOLOCK)]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

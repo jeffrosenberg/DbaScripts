@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>JobHistory</Title>
+      <Shortcut>JobHistory</Shortcut>
+      <Description>Get the detailed history of a SQL Server Agent job</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>JobName</ID>
+          <ToolTip />
+          <Default>DatabaseBackup - USER_DATABASES - FULL</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[USE msdb;
+GO
+
+EXEC dbo.sp_help_jobhistory 
+    @job_name = N'$JobName$',
+    @mode = 'FULL'
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

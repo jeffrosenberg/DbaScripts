@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>checkPartitionNumInfo</Title>
+      <Shortcut>checkPartitionNumInfo</Shortcut>
+      <Description>For given row key and assocated metadata, finds partition number and retrieves rows on that partition for the partition key</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--REFERENCE (SEE FOR MORE OPTIONS):  http://msdn.microsoft.com/en-us/library/ms188071.aspx
+--USE CTRL+SHIFT+M TO REPLACE MACRO REFERENCES BELOW e.g. DatabaseName, Schema, Table, FunctionKeyName, RowKey
+USE <DatabaseName, SYSNAME, LuxMDB>
+GO
+DECLARE 
+	@RowKeyValue SQL_VARIANT
+	, @PartitionNum INT
+	, @PartitionFunction SYSNAME
+	, @PartitionKeyType NVARCHAR(MAX)
+	, @Schema SYSNAME
+	, @Table SYSNAME
+	, @Cmd NVARCHAR(MAX)
+	, @Cmd2 NVARCHAR(MAX)
+	, @PartitionFunctionKeyName SYSNAME
+	-- @BrandKey NUMERIC(6)			--REPLACED WITH @RowKeyValue TO MAKE MORE GENERIC FOR OTHER PARTITIONING APPLICATIONS 
+	--SET @BrandKey = 2				--REPLACED WITH @RowKeyValue TO MAKE MORE GENERIC FOR OTHER PARTITIONING APPLICATIONS 
+SET @Schema = '<SchemaName, SYSNAME, Summary>'								-- Schema Name of partitioned table being searched for partition info
+SET @Table = '<TableName, SYSNAME, HouseholdTransactions>'					-- Table Name of partitioned table being searched for partition info
+SET @PartitionFunctionKeyName = '<FunctionKeyName, SYSNAME, Brand_Key>'		-- Partition Key Name of partitioned table being searched for partition inf
+SET @RowKeyValue = '<KeyValue, SYSNAME, 2>'									-- Key Value of partition rows being searched for partition info:  E.g. rows with Brand_Key = 2 then this is 2
+
+ -- GET PARTITION FUNCTION BY TABLE NAME
+SELECT DISTINCT
+		--ds.name	/* partition scheme */
+		@PartitionFunction = pf.name
+		, @PartitionKeyType = 
+								CASE WHEN t.name = N'uniqueidentifier' THEN 'VARCHAR(36)' ELSE UPPER(t.name) END + 
+								CASE WHEN t.name IN (N'nvarchar', N'varchar', N'nchar', N'char', N'varbinary', N'binary')
+										   THEN N'(' + CASE WHEN pp.max_length = -1 THEN N'MAX' ELSE CAST(pp.max_length AS NVARCHAR(5)) END + N')'
+										 WHEN t.name IN (N'datetime2', N'time2', N'datetimeoffset') 
+										   THEN N'(' + CAST(pp.scale AS NVARCHAR(5)) + N')'
+										 WHEN t.name IN (N'decimal', N'numeric')
+										   THEN N'(' + CAST(pp.[precision] AS NVARCHAR(5)) + N',' + CAST(pp.scale AS NVARCHAR(5)) + N')'
+										ELSE N''
+								END
+FROM	sys.partitions p
+		INNER JOIN sys.indexes i ON p.object_id = i.object_id
+									AND p.index_id = i.index_id
+		--INNER JOIN sys.data_spaces ds ON i.data_space_id = ds.data_space_id
+		--INNER JOIN sys.partition_schemes ps ON ps.name = ds.name
+		INNER JOIN sys.partition_schemes ps ON ps.data_space_id = i.data_space_id
+		INNER JOIN sys.partition_functions pf ON pf.function_id = ps.function_id
+		INNER JOIN sys.partition_parameters AS pp ON ps.function_id = pp.function_id
+		INNER JOIN sys.types AS t ON pp.system_type_id = t.system_type_id
+WHERE	OBJECT_SCHEMA_NAME(p.object_id) = @Schema
+		AND OBJECT_NAME(p.object_id) = @Table
+	
+					
+-- GET NUMBER
+SET @Cmd = N'SELECT @PartitionNumOut = $PARTITION.' + @PartitionFunction + '(CONVERT(' + @PartitionKeyType + ', @RowKeyValueIn))';
+EXEC sp_executesql @Cmd, N'@RowKeyValueIn SQL_VARIANT, @PartitionNumOut INT OUTPUT', @RowKeyValueIn=@RowKeyValue, @PartitionNumOut=@PartitionNum OUTPUT
+--SET @Cmd = N'SELECT @PartitionNumOut = $PARTITION.' + @PartitionFunction + '(@BrandKeyIn)';													--REPLACED WITH @RowKeyValue TO MAKE MORE GENERIC FOR OTHER PARTITIONING APPLICATIONS 
+--EXEC sp_executesql @Cmd, N'@BrandKeyIn INT, @PartitionNumOut INT OUTPUT', @BrandKeyIn=@BrandKey, @PartitionNumOut=@PartitionNum OUTPUT		--REPLACED WITH @RowKeyValue TO MAKE MORE GENERIC FOR OTHER PARTITIONING APPLICATIONS 
+
+-- SHOW NUMBER
+SELECT @PartitionNum AS PartitionNum
+
+-- GET RECORDS FOR PARTITION NUMBER
+SET @Cmd2 = 'SELECT * FROM ' + @Schema + '.' + @Table + ' ' + 
+			'WHERE $PARTITION.' + @PartitionFunction + '(' + @PartitionFunctionKeyName + ') = ' + CONVERT(VARCHAR(MAX), @PartitionNum) + ';'
+
+SELECT @Cmd2 AS RetrievePartitionRowsSQL
+
+EXEC sp_executesql @Cmd2
+--SELECT * FROM Summary.HouseholdTransactions																									--REPLACED WITH DYNAMIC SQL ABOVE
+--WHERE $PARTITION.pfLuxBrandKeys(Brand_Key) = @PartitionNum;																					--REPLACED WITH DYNAMIC SQL ABOVE
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

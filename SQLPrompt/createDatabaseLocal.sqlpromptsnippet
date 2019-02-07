@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>createDatabaseLocal</Title>
+      <Shortcut>createDatabaseLocal</Shortcut>
+      <Description>Create a database on localhost</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>newDbName</ID>
+          <ToolTip />
+          <Default>TestDb</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[USE master;
+GO
+
+CREATE DATABASE [$newDbName$]
+CONTAINMENT = NONE
+ON PRIMARY 
+( NAME = N'$newDbName$', 
+  FILENAME = N'C:\SQL\Data\$newDbName$.mdf', 
+  SIZE = 50MB , FILEGROWTH = 50MB )
+LOG ON 
+( NAME = N'$newDbName$_log', 
+  FILENAME = N'C:\SQL\Log\$newDbName$_log.ldf', 
+  SIZE = 50MB, FILEGROWTH = 50MB )
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

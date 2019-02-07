@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sca_test_query_DCS</Title>
+      <Shortcut>sca_test_query_DCS</Shortcut>
+      <Description>DCS Report Perf Issue</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[declare @P1 NUMERIC(10) = 5302, @P2 NUMERIC(10) = 1500
+select top 100 a.AccrualStagingId, a.StatusId, a.Ace01, a.Ace02, a.Ace03, a.TranDate, sa.FlightNumber, sa.PassengerName, m.MemberId, m.AccountNumber, m.FName, m.LName
+FROM AccrualStaging a
+INNER JOIN ScaAccrualStaging sa ON sa.AccrualStagingId = a.AccrualStagingId
+INNER JOIN Member m on m.AccountNumber = a.AccountNumber AND m.Mbr_Status = @P2
+WHERE a.Deleted = 0 AND a.StatusId IN ( @P1 )
+ORDER BY a.TranDate DESC, a.AccrualStagingId DESC
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

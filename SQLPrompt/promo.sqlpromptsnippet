@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>promo</Title>
+      <Shortcut>promo</Shortcut>
+      <Description>Monitor Promo Member Comm Job(s)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[declare @communicationID numeric
+set @communicationID=19005
+
+select REPLACE(CONVERT(varchar(20), (CAST(count(*) AS money)), 1), '.00', '') as Completed
+from AmtrakMarketing.dbo.PROMO_MEMBERCOMMUNICATION (nolock) 
+where COMMUNICATIONID=@communicationID and statusid=1100
+
+
+select REPLACE(CONVERT(varchar(20), (CAST(count(*) AS money)), 1), '.00', '') as targeted 
+from AmtrakMarketing.dbo.MEMBEROFFER (nolock) 
+where COMMUNICATIONID=@communicationID
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

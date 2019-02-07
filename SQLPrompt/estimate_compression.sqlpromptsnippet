@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>estimate_compression</Title>
+      <Shortcut>estimate_compression</Shortcut>
+      <Description>Estimate Compression Savings</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <Database Name, SYNAME, dbname>;
+GO
+EXEC sp_estimate_data_compression_savings '<Schema Name, SYSNAME, dbo>', '<Table Name, SYSNAME, member>', NULL, NULL, '<Compression Type, VARCHAR, ROW | PAGE | NONE>' ;
+GO
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

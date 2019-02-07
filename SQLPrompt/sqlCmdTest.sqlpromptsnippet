@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sqlCmdTest</Title>
+      <Shortcut>sqlCmdTest</Shortcut>
+      <Description>Test that SQLCMD mode is turned on (code taken from SSDT publish template)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[:setvar __IsSqlCmdEnabled "True"
+GO
+IF N'$(__IsSqlCmdEnabled)' NOT LIKE N'True'
+    BEGIN
+        PRINT N'SQLCMD mode must be enabled to successfully execute this script.';
+        SET NOEXEC ON;
+    END
+
+
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

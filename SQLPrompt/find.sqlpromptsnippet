@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>find</Title>
+      <Shortcut>find</Shortcut>
+      <Description>Find code</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE master
+GO
+--CHECK LINKED SERVERS
+SELECT * 
+FROM  sys.servers s
+WHERE LOWER(data_source) LIKE '%<searched_reference, sysname, sqlx64mart>%'
+
+--QUERY SQL CODE
+SELECT 
+	distinct o.name 
+FROM 
+	sysobjects o
+	INNER JOIN syscomments c 
+		ON o.id = c.id
+WHERE 
+	LOWER(text)  LIKE '%<searched_reference, sysname, sqlx64mart>%'
+	
+--QUERY SSIS PACKAGE DATA
+use msdb
+GO
+-- 2008/2008r2
+IF @@Microsoftversion / 0x01000000 = 10
+SELECT  
+	*, CONVERT(XML, CONVERT(VARBINARY(MAX), packagedata)) AS PackageXML
+FROM 
+	sysssispackages WITH(NOLOCK)
+WHERE 
+	Lower(CONVERT(VARCHAR(MAX), CONVERT(VARBINARY(MAX), packagedata))) LIKE '%<searched_reference, sysname, sqlx64mart>%'
+-- 2005
+IF @@Microsoftversion / 0x01000000 = 9
+SELECT  
+	*, CONVERT(XML, CONVERT(VARBINARY(MAX), packagedata)) AS PackageXML
+FROM 
+	sysdtspackages90 WITH(NOLOCK)
+WHERE 
+	Lower(CONVERT(VARCHAR(MAX), CONVERT(VARBINARY(MAX), packagedata))) LIKE '%<searched_reference, sysname, sqlx64mart>%'
+
+--QUERY JOB STEPS
+use msdb
+SELECT 
+	@@SERVERNAME
+	, j.[name] AS job_name
+	, js.step_name 
+	, UPPER(LEFT(@@SERVERNAME,1)) + RIGHT(LOWER(@@SERVERNAME),LEN(@@SERVERNAME)-1)
+		+ '.'
+		+ j.[name]
+		+ '.'
+		+ js.step_name 
+FROM
+	sysjobs j
+	INNER JOIN 
+	sysjobsteps js
+	ON j.job_id = js.job_id
+WHERE lower(command) LIKE '%<searched_reference, sysname, sqlx64mart>%'
+GO
+
+USE master
+GO
+
+--CHECK CODE FOR EACH DB
+sp_msforeachdb 'USE ? SELECT @@SERVERNAME + ''.'' + ''?'' + ''.'' + o.Name FROM sysobjects o WITH(NOLOCK) INNER JOIN syscomments c WITH(NOLOCK) ON o.id = c.id WHERE lower(text) LIKE ''%<searched_reference, sysname, sqlx64mart>%'''
+GO
+
+--CHECK SYNONYMS FOR EACH DB
+sp_msforeachdb 'USE ? SELECT @@SERVERNAME + ''.'' + ''?'' + ''.'' + o.Name FROM sysobjects o WITH(NOLOCK) INNER JOIN sys.synonyms s WITH(NOLOCK) ON o.id = s.object_id WHERE lower(base_object_name) LIKE ''%<searched_reference, sysname, sqlx64mart>%'''
+GO
+
+--FIND DB CLR ASSEMBLIES
+sp_msforeachdb 'USE ? SELECT @@SERVERNAME + ''.'' + ''?'' + ''.'' + a.Name FROM sys.assemblies a WITH(NOLOCK)'
+
+--FIND REPORTS
+USE ReportServer
+GO
+SELECT 
+	@@SERVERNAME + ':Path=' + Path + '/' + Name, CONVERT(VARCHAR(MAX), CONVERT(VARBINARY(MAX),Content)) AS ReportContentRDL--, c.*
+FROM  
+	dbo.Catalog AS c 
+WHERE 
+	Content IS NOT NULL
+	AND
+	LOWER(CONVERT(VARCHAR(MAX), CONVERT(VARBINARY(MAX),Content))) LIKE LOWER('%<searched_reference, sysname, sqlx64mart>%')]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

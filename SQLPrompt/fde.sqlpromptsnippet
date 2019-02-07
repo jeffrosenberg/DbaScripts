@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>fde</Title>
+      <Shortcut>fde</Shortcut>
+      <Description>Fulcrum Date Converstion - End</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[, 6),' ','-')) ]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>defaultConstraint</Title>
+      <Shortcut>defaultConstraint</Shortcut>
+      <Description>Create default constraint</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>TableName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>DefaultName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>DefaultValue</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+        <Literal>
+          <ID>ColumnName</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[ALTER TABLE $TableName$
+ADD CONSTRAINT $DefaultName$ 
+DEFAULT $DefaultValue$ FOR $ColumnName$]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

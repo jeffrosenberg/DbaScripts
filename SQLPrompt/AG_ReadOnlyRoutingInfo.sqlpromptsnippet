@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AG_ReadOnlyRoutingInfo</Title>
+      <Shortcut>AG_ReadOnlyRoutingInfo</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[----Script can be found in:  
+----P:\SQL2012\Scripts
+
+
+---------------------------------------------------------------------------------
+-- These changes were applied to the Dev Server after it was created by Nick C.
+--
+-- AG Listener: tru-db-qa-ag01.yosemite.local          10.12.14.224
+--
+-- Nodes:     MPSTRUDBPOC01.yosemite.local             10.12.14.63
+--            MPSTRUDBPOC02.yosemite.local             10.12.14.228
+--            MPSTRUDBPOC03.yosemite.local             10.12.14.123
+-- 
+-- AG Name:   tru-db-qa-ag
+-- 
+-- Virtual IP:       tru-db-qa-reader.yosemite.local          10.12.5.142
+-- 
+---------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------
+-- Helpful queries, DMVs
+-- http://technet.microsoft.com/en-us/library/ff877943.aspx
+--------------------------------------------------------------
+select @@ServerName 
+
+select * from sys.availability_read_only_routing_lists 
+select * from sys.dm_hadr_cluster_members
+select * from sys.dm_hadr_availability_replica_states
+select db.name, hdrs.* from sys.dm_hadr_database_replica_states hdrs
+       inner join sys.databases db
+              on hdrs.database_id = db.database_id
+
+
+---------------------------------------------------------------
+-- Updates for Connections allowed per Replica/Replica State
+---------------------------------------------------------------
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC02' WITH 
+(PRIMARY_ROLE (ALLOW_CONNECTIONS = READ_WRITE));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC02' WITH 
+(SECONDARY_ROLE (ALLOW_CONNECTIONS = ALL));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC01' WITH 
+(PRIMARY_ROLE (ALLOW_CONNECTIONS = READ_WRITE));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC01' WITH 
+(SECONDARY_ROLE (ALLOW_CONNECTIONS = ALL));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC03' WITH 
+(PRIMARY_ROLE (ALLOW_CONNECTIONS = READ_WRITE));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC03' WITH 
+(SECONDARY_ROLE (ALLOW_CONNECTIONS = ALL));
+
+
+---------------------------------------------------
+-- Updates for Read-Only Routing URLs
+---------------------------------------------------
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC02' WITH 
+(SECONDARY_ROLE (READ_ONLY_ROUTING_URL = N'tcp://MPSTRUDBPOC02.yosemite.local:1433'));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC01'  WITH 
+(SECONDARY_ROLE (READ_ONLY_ROUTING_URL = 'tcp://MPSTRUDBPOC01.yosemite.local:1433'));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC03' WITH 
+(SECONDARY_ROLE (READ_ONLY_ROUTING_URL = N'tcp://MPSTRUDBPOC03.yosemite.local:1433'));
+
+
+
+---------------------------------------------------
+-- Updates for Read-Only Routing
+---------------------------------------------------
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC02' WITH 
+(PRIMARY_ROLE (READ_ONLY_ROUTING_LIST=('MPSTRUDBPOC03', 'MPSTRUDBPOC01')));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC01' WITH 
+(PRIMARY_ROLE (READ_ONLY_ROUTING_LIST=('MPSTRUDBPOC02', 'MPSTRUDBPOC03')));
+
+ALTER AVAILABILITY GROUP [tru-db-qa-ag]
+MODIFY REPLICA ON
+N'MPSTRUDBPOC03' WITH 
+(PRIMARY_ROLE (READ_ONLY_ROUTING_LIST=('MPSTRUDBPOC02', 'MPSTRUDBPOC01')));
+
+
+
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

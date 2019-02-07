@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AddPermissionXpCmdShellXpCreateSubDir</Title>
+      <Shortcut>AddPermissionXpCmdShellXpCreateSubDir</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [master]
+GO
+/*
+	In sql mgmt studio, to replace template parameters below (e.g. Database Name):
+	
+	press=>  CTRL+SHIFT+M 
+	OR 
+	click=> Query Menu->Specify Values for Template Parameters
+
+*/
+GRANT EXECUTE ON xp_cmdshell TO [OLSON\HGP_SQL_QA_RW];
+GRANT EXECUTE ON xp_create_subdir TO [OLSON\HGP_SQL_QA_RW];]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>xqueryGetAttribValue</Title>
+      <Shortcut>xqueryGetAttribValue</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+DROP TABLE #utilTest 
+CREATE TABLE #utilTest (Value VARCHAR(500))
+INSERT INTO #utilTest
+        ( Value )
+VALUES  ('<prop DefaultValue="Y" RequireOnUse="1" IncludeOnResponse="0" RequiredForRequest="0" RequiredForOffer="1" NonTransferable="1" />')
+		,('<prop DefaultValue="Y" RequireOnUse="1" IncludeOnResponse="0" RequiredForRequest="1" RequiredForOffer="1" NonTransferable="0" />')
+SELECT 
+	TRY_CONVERT(XML, Value).value('(/prop/@DefaultValue)[1]', 'VARCHAR(MAX)')
+FROM 
+	#utilTest
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

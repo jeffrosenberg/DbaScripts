@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckDatabasesWithoutCurrentBackups</Title>
+      <Shortcut>CheckDatabasesWithoutCurrentBackups</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[IF OBJECT_ID('sys.dm_hadr_database_replica_states') IS NOT NULL
+AND OBJECT_ID('sys.dm_hadr_availability_replica_states') IS NOT NULL
+	Select count(*)
+		--, d.name, ISNULL(A.role_desc,'PRIMARY')
+	from sys.databases d
+		LEFT OUTER JOIN sys.dm_hadr_database_replica_states D2
+			ON d.database_id = d2.database_id
+		LEFT OUTER JOIN sys.dm_hadr_availability_replica_states A
+			ON a.replica_id = d2.replica_id and a.group_id = d2.group_id
+	Where 
+	d.name <> 'tempDB'
+	And d.state = 0 -- online
+	And d.source_database_id Is Null
+	And Not Exists (
+		Select 1 From msdb.dbo.backupset
+		Where database_name = d.name
+		And type In ('D', 'I')
+		And DateDiff(hh, backup_finish_date, getdate()) < 168)
+	AND ISNULL(A.role_desc,'PRIMARY') = 'PRIMARY'
+	--GROUP BY d.name, A.role_desc
+	;
+ELSE
+	Select count(*)
+		--, d.name, ISNULL(A.role_desc,'PRIMARY')
+	from sys.databases d
+	Where 
+	d.name <> 'tempDB'
+	And d.state = 0 -- online
+	And d.source_database_id Is Null
+	And Not Exists (
+		Select 1 From msdb.dbo.backupset
+		Where database_name = d.name
+		And type In ('D', 'I')
+		And DateDiff(hh, backup_finish_date, getdate()) < 168)
+		;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

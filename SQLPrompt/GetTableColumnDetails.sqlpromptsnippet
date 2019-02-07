@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>GetTableColumnDetails</Title>
+      <Shortcut>GetTableColumnDetails</Shortcut>
+      <Description>Gets Tablename, Columnname, Position, Type, Length, Precision, Scale etc. by list of table names</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT
+	OBJECT_SCHEMA_NAME(c.object_id) + '.' + OBJECT_NAME(c.object_id) AS TableName
+  , c.name AS ColumnName
+  , c.column_id AS ColumnPos
+  , t.name AS Type
+  , c.max_length
+  , c.precision
+  , c.scale
+FROM
+	sys.columns c
+	INNER JOIN sys.types AS t
+		ON t.system_type_id = c.system_type_id
+WHERE
+	c.object_id IN ( 
+						OBJECT_ID('dbo.Accrual')
+						, OBJECT_ID('dbo.AccrualStaging') 
+				   )
+ORDER BY
+	c.object_id
+  , c.column_id
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

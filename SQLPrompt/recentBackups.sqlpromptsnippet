@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>recentBackups</Title>
+      <Shortcut>recentBackups</Shortcut>
+      <Description>View recent backups on a server (optionally filtered by database)</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT bs.database_name
+     , bs.backup_start_date
+     , bs.type
+     , bs.first_lsn
+     , bs.last_lsn
+     , bmf.physical_device_name
+FROM msdb..backupset AS bs
+INNER JOIN msdb..backupmediafamily AS bmf
+  ON bmf.media_set_id = bs.media_set_id
+WHERE bs.backup_start_date >= DATEADD(day, -14, GETDATE())
+  AND [type] LIKE '%' -- D = database (i.e. full), I = differential, L = log
+  --AND bs.database_name IN ()
+  AND bs.database_name NOT IN ('master', 'model', 'msdb', 'tempdb')
+ORDER BY backup_start_date DESC]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

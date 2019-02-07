@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CreateAlphaNumericReferenceKeyWithRowNum</Title>
+      <Shortcut>CreateAlphaNumericReferenceKeyWithRowNum</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[;WITH cteAlphaNumConv AS 
+(
+-- Alpha
+SELECT 
+	n RowNum
+	, CASE WHEN n<=26 THEN CHAR(n+64) ELSE CHAR(n+21) END AS AssignedValue
+	
+      FROM ( SELECT ROW_NUMBER() OVER ( ORDER BY o.object_id )
+               FROM sys.objects o CROSS JOIN sys.objects o2) D ( n )
+     WHERE n <= 36
+)
+, cteAlphaNumConvCombined
+AS
+(
+SELECT CONCAT(c1.AssignedValue, c2.AssignedValue, c3.AssignedValue) AS ReferenceKey, 10000*c1.RowNum + 100*c2.RowNum + c3.RowNum AS SortKey FROM cteAlphaNumConv c1 CROSS JOIN cteAlphaNumConv c2 CROSS JOIN cteAlphaNumConv c3
+)
+SELECT 
+	ROW_NUMBER() OVER (ORDER BY c.SortKey) AS RowNum
+	, c.ReferenceKey
+	, c.SortKey
+FROM cteAlphaNumConvCombined c 
+ORDER BY c.SortKey]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

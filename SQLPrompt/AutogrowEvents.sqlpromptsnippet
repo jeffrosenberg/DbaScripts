@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AutogrowEvents</Title>
+      <Shortcut>AutogrowEvents</Shortcut>
+      <Description>Queries the default trace for recent autogrow events</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @path NVARCHAR(260);
+
+--Get the path to the original trace file
+--Rollover files will be included automatically
+SELECT  @path = REVERSE(SUBSTRING(REVERSE([path]), CHARINDEX('\', REVERSE([path])), 260)) + N'log.trc'
+FROM sys.traces
+WHERE is_default = 1;
+
+SELECT ServerName, DatabaseID, DatabaseName, [FileName]
+, FileType = CASE EventClass 
+              WHEN 92 THEN 'Data'
+              WHEN 93 THEN 'Log'
+              END
+, StartTime, EndTime, Duration
+, ApplicationName, NTDomainName, HostName
+, LoginName, SessionLoginName
+FROM sys.fn_trace_gettable(@path, DEFAULT) --DEFAULT = include rollover files
+WHERE EventClass IN (92,93) --Data/Log file auto growth events
+ORDER BY StartTime DESC;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

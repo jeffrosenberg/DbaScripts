@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dir</Title>
+      <Shortcut>dir</Shortcut>
+      <Description>xm_cmdshell 'dir /s' command</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>path</ID>
+          <ToolTip />
+          <Default>Z:</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[DECLARE @cmd varchar(4000);
+SET @cmd = 'dir $path$ /s';
+
+EXEC xp_cmdshell @cmd;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

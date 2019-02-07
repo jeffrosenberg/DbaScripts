@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>re</Title>
+      <Shortcut>re</Shortcut>
+      <Description>Read Error Log</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[xp_readerrorlog 0, 1, <search, string param, N'search term here'>, NULL, '<start date, date param, $DATE(yyyyMMdd)$>', '<end date, date param, $DATE(yyyyMMdd)$ 23:59>']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

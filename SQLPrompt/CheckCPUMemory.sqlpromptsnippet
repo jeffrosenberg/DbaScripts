@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckCPUMemory</Title>
+      <Shortcut>CheckCPUMemory</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT cpu_count AS [Logical CPU Count], hyperthread_ratio AS Hyperthread_Ratio,
+cpu_count/hyperthread_ratio AS Physical_CPU_Count,
+physical_memory_kb/1024 AS Physical_Memory_in_MB,
+sqlserver_start_time, affinity_type_desc -- (affinity_type_desc is only in 2008 R2)
+FROM sys.dm_os_sys_info
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

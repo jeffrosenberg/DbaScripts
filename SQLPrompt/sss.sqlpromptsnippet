@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>sss</Title>
+      <Shortcut>sss</Shortcut>
+      <Description>Script Synonym Statements</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT
+    'CREATE SYNONYM [' + s2.name + '].[' + s.name + '] FOR '
+    + s.base_object_name
+FROM
+    sys.synonyms AS s
+    INNER JOIN sys.schemas AS s2 ON s.schema_id = s2.schema_id]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

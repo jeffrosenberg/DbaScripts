@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>fmtDateTimeYYYYMMDD</Title>
+      <Shortcut>fmtDateTimeYYYYMMDD</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[FORMAT(TRY_CONVERT(DATETIME, CONVERT(VARCHAR(50), ABS(yst.TransactionSummaryYearDescriptionYTD))), 'yyyyMMdd', 'en-US' )]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

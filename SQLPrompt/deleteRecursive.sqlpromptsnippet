@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>deleteRecursive</Title>
+      <Shortcut>deleteRecursive</Shortcut>
+      <Description>Delete all files and remove all subdirectories</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>FilePath</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[DECLARE @cmd varchar(8000);
+
+--Delete all files in all subdirectories without prompting
+SET @cmd = 'del /s /q $FilePath$'
+EXEC sys.xp_cmdshell @cmd;
+
+--Remove all subdirectories without prompting
+SET @cmd = 'rmdir /s /q $FilePath$'
+--EXEC sys.xp_cmdshell @cmd;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Pivot</Title>
+      <Shortcut>Pivot</Shortcut>
+      <Description>Create a PIVOT query</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT FieldsFromSrcTable, [Value01], [Value02], [Value03]
+FROM (
+  SELECT
+  FROM
+) AS src
+PIVOT ( 
+  SUM(ColumnToAggregate)
+  FOR ColumnToPivotOn IN ([Value01], [Value02], [Value03])
+) AS pvt]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

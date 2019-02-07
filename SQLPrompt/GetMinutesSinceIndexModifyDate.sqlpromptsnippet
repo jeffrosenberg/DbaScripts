@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>GetMinutesSinceIndexModifyDate</Title>
+      <Shortcut>GetMinutesSinceIndexModifyDate</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @oid int
+SELECT  @oid = id FROM sysindexes WHERE name = '<Index Name, sysname, tmpIndexTransactionDetailMemHGP>'
+SELECT DATEDIFF(mi,o.modify_date,getdate()), * FROM sys.objects AS o WHERE o.object_id = @oid
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

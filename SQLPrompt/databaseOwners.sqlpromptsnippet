@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>databaseOwners</Title>
+      <Shortcut>databaseOwners</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT database_name = d.name
+     , database_id = d.database_id
+     , owner_name = sp.name
+FROM master.sys.databases AS d
+LEFT JOIN master.sys.server_principals AS sp
+  ON d.owner_sid = sp.sid]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

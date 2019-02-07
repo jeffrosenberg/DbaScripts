@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>diskUsageDb</Title>
+      <Shortcut>diskUsageDb</Shortcut>
+      <Description>Disk usage per database</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT database_id, database_name = DB_NAME(database_id)
+, data_size_mb = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size * 8.0 / 1024 END) AS decimal(9,2))
+, log_size_mb  = CAST(SUM(CASE WHEN type_desc = 'LOG'  THEN size * 8.0 / 1024 END) AS decimal(8,2))
+, total_size_mb  = CAST(SUM(size * 8.0 / 1024) AS decimal(11,2))
+FROM sys.master_files
+GROUP BY database_id
+UNION ALL
+SELECT database_id = 99998
+, database_name = 'TOTAL User DBs'
+, data_size_mb = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size * 8.0 / 1024 END) AS decimal(9,2))
+, log_size_mb  = CAST(SUM(CASE WHEN type_desc = 'LOG'  THEN size * 8.0 / 1024 END) AS decimal(8,2))
+, total_size_mb  = CAST(SUM(size * 8.0 / 1024) AS decimal(11,2))
+FROM sys.master_files
+WHERE database_id > 4
+UNION ALL
+SELECT database_id = 99999
+, database_name = 'TOTAL ALL DBs'
+, data_size_mb = CAST(SUM(CASE WHEN type_desc = 'ROWS' THEN size * 8.0 / 1024 END) AS decimal(9,2))
+, log_size_mb  = CAST(SUM(CASE WHEN type_desc = 'LOG'  THEN size * 8.0 / 1024 END) AS decimal(8,2))
+, total_size_mb  = CAST(SUM(size * 8.0 / 1024) AS decimal(11,2))
+FROM sys.master_files
+ORDER BY database_id]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

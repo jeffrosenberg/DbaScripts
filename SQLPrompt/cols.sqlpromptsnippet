@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cols</Title>
+      <Shortcut>cols</Shortcut>
+      <Description>Generate Column List</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <DatabaseName, VARCHAR(500), SynchAdamED>
+GO
+DECLARE @Tablename VARCHAR(500)
+	, @IncludeDatatype BIT
+	, @IncludeRowOneComma BIT
+	, @IncludeTargetSourceCompare BIT
+	, @IncludeSourcePrefix BIT
+	, @IncludeAlias BIT
+	, @TargetSourceOperator VARCHAR(50)
+	, @TargetSourceDelimiter VARCHAR(50)
+	, @ReplaceNameCharacters VARCHAR(50)
+	, @ReplaceAliasCharacters VARCHAR(50)
+	, @IncludeSpecialPrefix BIT
+	, @IncludeSpecialSuffix BIT
+	, @SpecialPrefix VARCHAR(50)
+	, @SpecialSuffix VARCHAR(MAX)
+DECLARE @ExcludedColumns TABLE (ColumnName VARCHAR(MAX))
+SET @Tablename = '<TableName, VARCHAR(500), Traffic>'
+SET @IncludeDatatype = <IncludeDataType, BIT, 0>
+SET @IncludeRowOneComma = <IncludeRowOneComma, BIT, 0>
+SET @IncludeTargetSourceCompare = <IncludeTargetSourceCompare, BIT, 0>
+SET @IncludeSourcePrefix = <IncludeSourcePrefix, BIT, 0>
+SET @TargetSourceDelimiter = <TargetSourceDelimiter, VARCHAR(50), 'OR '>		-- , OR AND
+SET @TargetSourceOperator = <TargetSourceOperator, VARCHAR(50), ' = '>		-- =  != AND
+SET @ReplaceNameCharacters = <ReplaceNameCharacters, VARCHAR(50), ''>
+SET @IncludeAlias = <IncludeAlias, BIT, 1>
+SET @ReplaceAliasCharacters = <ReplaceAliasCharacters, VARCHAR(50), '_'>
+SET @IncludeSpecialPrefix = 0
+SET @IncludeSpecialSuffix = 0
+SET @SpecialPrefix = '"        , '		-- USED FOR SSIS SCRIPT TO CREATE TABLES
+SET @SpecialSuffix = ' " +'				-- USED FOR SSIS SCRIPT TO CREATE TABLES
+
+INSERT INTO @ExcludedColumns (ColumnName)
+VALUES <ExlcludedColumns, VARCHAR(MAX), ('Media'),('Product'),('Creative_Code_NQ'),('Creative_Name_NQ')>
+
+;WITH cteColumns AS
+(
+	SELECT DISTINCT
+		1 AS const
+		,
+		CASE WHEN @IncludeTargetSourceCompare = 0
+		THEN
+			+ REPLACE(c.NAME,@ReplaceNameCharacters,'')
+			+ 
+			CASE WHEN @IncludeDatatype = 1 
+			THEN
+			' '
+			+ UPPER(CASE WHEN t2.NAME ='TEXT' THEN 'VARCHAR(MAX)' ELSE t2.NAME END)
+			+ CASE WHEN UPPER(t2.NAME) IN ('VARCHAR','NVARCHAR','BINARY') THEN '(' + CONVERT(VARCHAR, c.max_length) + ')' ELSE '' END
+			ELSE ''
+			END 
+		ELSE	
+			' target.'
+			+ REPLACE(c.NAME,@ReplaceNameCharacters,'')
+			+ ' '
+			+ @TargetSourceOperator
+			+ ' source.'
+			+ REPLACE(c.NAME,@ReplaceNameCharacters,'')
+		END
+		+ 
+		CASE WHEN @IncludeAlias = 1
+		 THEN ' AS ' + REPLACE(c.NAME,@ReplaceAliasCharacters,'')
+		 ELSE ''
+		END
+		AS columnlist
+		, c.column_id
+FROM  
+	sys.columns AS c
+	INNER JOIN sys.tables AS t 
+	ON c.object_id = t.object_id
+	INNER JOIN sys.types AS t2
+	ON c.user_type_id = t2.user_type_id
+WHERE
+	t.name = @Tablename
+	/* REPLACE WITH COLUMN TO EXCLUDE AND ADD SUBSEQUENT LINES OF SAME FOR EACH COLUMN */
+	AND c.name NOT IN (SELECT ColumnName FROM @ExcludedColumns)
+	AND c.name NOT LIKE 'XXX%'
+
+)
+SELECT 
+	CASE WHEN @IncludeSpecialPrefix=1 THEN @SpecialPrefix ELSE '' END +
+	CASE WHEN ROW_NUMBER() OVER (ORDER BY const)=1 AND @IncludeRowOneComma=0 AND @IncludeSourcePrefix=1 THEN 'source.' WHEN ROW_NUMBER() OVER (ORDER BY const)=1 AND @IncludeRowOneComma=0 THEN '' WHEN @IncludeTargetSourceCompare=1 THEN @TargetSourceDelimiter WHEN @IncludeSourcePrefix=1 THEN ', source.' ELSE ', ' END
+	+ columnlist	
+	+ CASE WHEN @IncludeSpecialSuffix=1 THEN @SpecialSuffix ELSE '' END
+FROM
+	cteColumns
+ORDER BY Column_id]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

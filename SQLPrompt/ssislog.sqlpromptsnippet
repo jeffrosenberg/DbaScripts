@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ssislog</Title>
+      <Shortcut>ssislog</Shortcut>
+      <Description>Get SSIS log messages</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT * FROM dbo.sysssislog AS s WITH(NOLOCK)
+WHERE event IN ('OnTaskFailed', 'User:OnError', 'OnError', 'User:OnTaskFailed')
+ORDER BY endtime DESC
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

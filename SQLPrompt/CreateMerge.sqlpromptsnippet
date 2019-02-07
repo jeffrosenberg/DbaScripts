@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CreateMerge</Title>
+      <Shortcut>CreateMerge</Shortcut>
+      <Description>Generate Merge Statement from Table Name and list of key columns</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE <DatabaseName, sysname, HyattMigr>
+GO
+	SET NOCOUNT ON
+	BEGIN TRY
+
+		DECLARE @Stmt NVARCHAR(MAX) = ''
+		DECLARE @PrintStmt BIT = 1
+		DECLARE @ExecStmt BIT = 0
+		DECLARE @TableName SYSNAME = 'ACE_Brands'			--SET
+		DECLARE @KeyColumns TABLE (KeyColumn SYSNAME)
+		INSERT INTO @KeyColumns VALUES					--SET 
+			('BrandID')
+			--,('Key Column 2 Here')
+
+		DECLARE @crlf VARCHAR(MAX) = CHAR(13)+CHAR(10)
+		DECLARE @tabs VARCHAR(MAX) = CHAR(9)+CHAR(9)
+		IF NOT EXISTS(SELECT 1 
+		FROM sys.columns 
+		WHERE OBJECT_SCHEMA_NAME(object_id) = 'dbo' AND object_name(object_id) = @TableName)
+		RAISERROR('Table used to model merge is not found.', 16, 1);
+
+		DECLARE @KeyColumnsList VARCHAR(MAX) = ''
+		SELECT @KeyColumnsList = @KeyColumnsList + @tabs + CHAR(9) + 'AND src.' + name + ' = trg.' + name + @crlf
+		FROM sys.columns 
+		WHERE OBJECT_SCHEMA_NAME(object_id) = 'dbo' AND object_name(object_id) = @TableName AND EXISTS(SELECT 1 FROM @KeyColumns WHERE KeyColumn=name)
+		SET @KeyColumnsList = SUBSTRING(@KeyColumnsList, 8,LEN(@KeyColumnsList))
+
+		DECLARE @NonKeyColumnsList VARCHAR(MAX) = ''
+		SELECT @NonKeyColumnsList = @NonKeyColumnsList + @tabs + CHAR(9) + ', ' + name + ' = src.' + name + @crlf
+		FROM sys.columns 
+		WHERE OBJECT_SCHEMA_NAME(object_id) = 'dbo' AND object_name(object_id) = @TableName AND NOT EXISTS(SELECT 1 FROM @KeyColumns WHERE KeyColumn=name)
+		SET @NonKeyColumnsList = SUBSTRING(@NonKeyColumnsList, 5,LEN(@NonKeyColumnsList))
+
+		DECLARE @FullColumns VARCHAR(MAX) = ''
+		SELECT @FullColumns = @FullColumns + @tabs + ', ' + name + @crlf + '     '
+		FROM sys.columns 
+		WHERE OBJECT_SCHEMA_NAME(object_id) = 'dbo' AND object_name(object_id) = @TableName
+		SET @FullColumns = SUBSTRING(@FullColumns, 4,LEN(@FullColumns))
+
+		DECLARE @FullColumnsSource VARCHAR(MAX) = ''
+		SELECT @FullColumnsSource = @FullColumnsSource + @tabs + ', src.' + name + @crlf + '     '
+		FROM sys.columns 
+		WHERE OBJECT_SCHEMA_NAME(object_id) = 'dbo' AND object_name(object_id) = @TableName
+		SET @FullColumnsSource = SUBSTRING(@FullColumnsSource, 4,LEN(@FullColumnsSource))
+
+		--DECLARE @Stmt NVARCHAR(MAX) = 
+		SET @Stmt = 
+		N';WITH src as (
+			select *
+			from FileIO.' + @TableName + '_D
+		)
+		MERGE dbo.' + @TableName + ' AS trg
+		USING src
+			ON ' + @KeyColumnsList + '
+		WHEN MATCHED THEN UPDATE SET 
+			 ' + @NonKeyColumnsList + '
+		WHEN NOT MATCHED THEN INSERT
+			(
+			 ' + @FullColumns + '
+			)
+			VALUES 
+			(
+			 ' + @FullColumnsSource + '
+			);'
+
+		IF @PrintStmt = 1
+		PRINT @Stmt
+
+		IF @ExecStmt = 1
+		EXEC sp_executesql @Stmt
+
+	END TRY
+	BEGIN CATCH
+		THROW
+	END CATCH]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>MarketingETL</Title>
+      <Shortcut>MarketingETL</Shortcut>
+      <Description>Amtrak MarketingETL status</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE AmtrakMarketing
+GO
+
+-- Get Most current row and the Last Load Date 
+SELECT top 5 *
+  FROM DATALOADSUMMARY 
+  ORDER BY LOADDT DESC
+    
+SELECT TOP 1000 *
+FROM dbo.ExecutionLog AS el
+WHERE 1=1
+ORDER BY id DESC ]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

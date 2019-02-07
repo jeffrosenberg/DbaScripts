@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>checkCompressed</Title>
+      <Shortcut>checkCompressed</Shortcut>
+      <Description>Check which tables are compressed or not</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[DECLARE @CompressionType INT, @Include BIT
+SET @Include = 1			-- 1 = Include; 0 = Exclude
+SET @CompressionType = 2
+							--	0 = Include Returns Not Compressed - Exclude will Returns Compressed
+							--	1 = Include Returns Row Compressed - Exclude will Returns Not Compressed or Page Compressed
+							--	2 = Include Returns Page Compressed - Exclude will Returns Not Compressed or Row Compressed
+
+--script to identify compressed tables
+SELECT st.name, st.object_id, sp.partition_id, sp.partition_number, sp.data_compression, 
+sp.data_compression_desc FROM sys.partitions SP
+INNER JOIN sys.tables ST ON
+st.object_id = sp.object_id
+WHERE 
+	(@Include = 1 AND data_compression = @CompressionType)
+	OR 
+	(@Include = 0 AND data_compression <> @CompressionType)
+
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>FFCol</Title>
+      <Shortcut>FFCol</Shortcut>
+      <Description>Lists for FlatFileDataReader/LineDetailReader classes</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+SELECT 
+	'"' + c.name + '",'	-- GET COLUMN LIST
+	, 
+	CASE 
+		WHEN t2.name IN ('numeric','decimal')
+			THEN 'typeof(decimal)'
+		WHEN t2.name IN ('char', 'nchar')
+			THEN 'typeof(char)'	
+		WHEN t2.name IN ('int', 'bigint')
+			THEN 'typeof(int)'	
+		WHEN t2.name IN ('datetime')
+			THEN 'typeof(DateTime)'	
+		ELSE
+			'typeof(string'
+	END + ','			-- GET LIST OF TYPES
+FROM  sys.columns c INNER JOIN sys.tables t
+ON c.object_id = t.object_id
+INNER JOIN sys.schemas s
+ON t.schema_id = s.schema_id
+INNER JOIN Sys.types t2
+ON c.user_type_id = t2.user_type_id
+WHERE t.name = 'CAMPAIGN_DIM' AND s.name = 'StagingWIP']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

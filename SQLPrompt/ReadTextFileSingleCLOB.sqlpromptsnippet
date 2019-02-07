@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>ReadTextFileSingleCLOB</Title>
+      <Shortcut>ReadTextFileSingleCLOB</Shortcut>
+      <Description>Reads an entire text file into a single field</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>FilePath</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT * 
+FROM OPENROWSET ( 
+  BULK '$FilePath$' 
+, SINGLE_CLOB
+) AS ors]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckBackupSet</Title>
+      <Shortcut>CheckBackupSet</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT  backup_start_date
+            ,type
+            ,first_lsn
+            ,last_lsn
+            ,checkpoint_lsn
+            ,database_backup_lsn
+  FROM  msdb..backupset
+WHERE   database_name = '<DatabaseName, SYSNAME, jRewardToysRUs>'    
+       and type = 'L'   
+ORDER BY backup_start_date]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

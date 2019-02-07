@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>agentJobIds</Title>
+      <Shortcut>agentJobIds</Shortcut>
+      <Description>Get job IDs and app names for SQL Server Agent jobs</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT job_id
+, name
+, job_binary = CONVERT(BINARY(16),job_id) 
+, [app_name] = 'SQLAgent - TSQL JobStep (Job ' + CONVERT(nvarchar(MAX), CONVERT(BINARY(16),job_id), 1)
+FROM msdb.dbo.sysjobs]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

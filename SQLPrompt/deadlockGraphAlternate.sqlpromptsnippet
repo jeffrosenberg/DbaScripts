@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>deadlockGraphAlternate</Title>
+      <Shortcut>deadlockGraphAlternate</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[-- 2008- Version
+-- Reference:  http://blogs.technet.com/b/mspfe/archive/2012/06/28/how_2d00_to_2d00_monitor_2d00_deadlocks_2d00_in_2d00_sql_2d00_server.aspx
+WITH SystemHealth
+ AS (
+ SELECT CAST(target_data as xml) AS TargetData
+ FROM sys.dm_xe_session_targets st
+ JOIN sys.dm_xe_sessions s
+ ON s.address = st.event_session_address
+ WHERE name = 'system_health'
+ AND st.target_name = 'ring_buffer')
+ 
+ SELECT XEventData.XEvent.value('(data/value)[1]','VARCHAR(MAX)') AS DeadLockGraph
+ FROM SystemHealth
+ CROSS APPLY TargetData.nodes('//RingBufferTarget/event') AS XEventData (XEvent)
+ WHERE XEventData.XEvent.value('@name','varchar(4000)') = 'xml_deadlock_report'
+
+-- 2012+ Version
+-- Reference:  http://blogs.technet.com/b/mspfe/archive/2012/06/28/how_2d00_to_2d00_monitor_2d00_deadlocks_2d00_in_2d00_sql_2d00_server.aspx
+WITH SystemHealth 
+AS ( 
+SELECT CAST(target_data as xml) AS TargetData 
+FROM sys.dm_xe_session_targets st 
+JOIN sys.dm_xe_sessions s 
+ON s.address = st.event_session_address 
+WHERE name = 'system_health' 
+AND st.target_name = 'ring_buffer') 
+
+SELECT XEventData.XEvent.query('(data/value/deadlock)[1]') AS DeadLockGraph 
+FROM SystemHealth 
+CROSS APPLY TargetData.nodes('//RingBufferTarget/event') AS XEventData (XEvent) 
+WHERE XEventData.XEvent.value('@name','varchar(4000)') = 'xml_deadlock_report']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

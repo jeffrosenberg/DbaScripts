@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>etlMeta</Title>
+      <Shortcut>etlMeta</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[INSERT INTO SSIS.EtlMetadata
+        (
+         TargetObjectId
+       , SourceObjectId
+       , LastLoadSourceStageKey
+       , MostRecentOnly
+       , StageTableName
+       , StageTableCleanup
+       , SourceKeyUpdateProcedureCall
+       , SourceKeyTableName
+       , SourcePackageName
+       , SourceProcessingOrder
+       , CreateDateTime
+       , UpdateDateTime
+        )
+VALUES  (
+         (SELECT TargetObjectId FROM SSIS.EtlMetadataTargetObjects WHERE TargetObject = 'dbo.<TargetTableName, String, FactTransactions>')
+       , -- TargetObjectId - int
+         (SELECT SourceObjectId FROM SSIS.EtlMetadataSourceObjects WHERE SourceObject = '<SourceObject, String, Staging.ItemDiscounts><SourceObjectModifier, String .Total|.Frequency, .Total>')
+       , -- SourceObjectId - int
+         0
+       , -- LastLoadSourceStageKey - int
+         <MostRecentOnly, bit (1|0), 1>
+       , -- MostRecentOnly - bit
+         'dbo.Stage<TargetTableName, String, FactTransactions><TargetTableNameSource, String (<empty>|sourcename), ItemDiscounts>'
+       , -- StageTableName - varchar(100)
+         'TRUNCATE TABLE dbo.Stage<TargetTableName, String, FactTransactions><TargetTableNameSource, String (<empty>|sourcename), ItemDiscounts>'
+       , -- StageTableCleanup - varchar(250)
+         'EXEC UpdateStage<TargetTableName, String, FactTransactions><TargetTableNameSource, String (<empty>|sourcename), ItemDiscounts>SourceKey'
+       , -- SourceKeyUpdateProcedureCall - varchar(100)
+         'dbo.<TargetTableName, String, FactTransactions><TargetTableNameSource, String (<empty>|sourcename), ItemDiscounts>'
+       , -- SourceKeyTableName - varchar(100)
+         '<SourcePackageName, String, PfcpwSsisTallyMdbFactsTransactionsSourceItemDiscounts.dtsx>'
+       , -- SourcePackageName - varchar(100)
+         <SourceProcessingOrder, String, 1>
+       , -- SourceProcessingOrder - int
+         GETDATE()
+       , -- CreateDateTime - datetime
+         GETDATE()  -- UpdateDateTime - datetime
+        )
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

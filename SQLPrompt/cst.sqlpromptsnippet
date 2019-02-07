@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>cst</Title>
+      <Shortcut>cst</Shortcut>
+      <Description>Check Schemas+Tables List</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT s.name + '.' + t.name
+FROM 
+	sys.tables t 
+	INNER JOIN sys.schemas AS s 
+		ON t.schema_id = s.schema_id]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>dbUtilLogQueryStats</Title>
+      <Shortcut>dbUtilLogQueryStats</Shortcut>
+      <Description>Log query stats, plans, and text to DBUtilities</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[EXEC DBUtilities.logs.LogQueryStats
+EXEC DBUtilities.logs.LogQueryPlans
+EXEC DBUtilities.logs.LogSqlText]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

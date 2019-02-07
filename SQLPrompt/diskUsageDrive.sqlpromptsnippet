@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>diskUsageDrive</Title>
+      <Shortcut>diskUsageDrive</Shortcut>
+      <Description>Disk usage per logical drive</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT drive = s.volume_mount_point, drive_name = s.logical_volume_name
+, database_size_gb = CAST(SUM(f.size * 8.0 / 1024 / 1024) AS decimal(6,2))
+, total_space_gb = CAST(MAX(s.total_bytes / 1024.0 / 1024 / 1024) AS decimal(7,2))
+, available_space_gb = CAST(MAX(s.available_bytes / 1024.0 / 1024 / 1024) AS decimal(7,2))
+, available_space_pct = 
+    CAST(
+      MAX(s.available_bytes) / MAX(s.total_bytes * 1.0) * 100
+      AS decimal(6,2))
+FROM sys.master_files AS f
+CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id) AS s
+GROUP BY s.volume_mount_point, s.logical_volume_name
+ORDER BY s.volume_mount_point]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

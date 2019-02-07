@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckContainedDBImpact</Title>
+      <Shortcut>CheckContainedDBImpact</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT SO.name, UE.* FROM sys.dm_db_uncontained_entities AS UE
+LEFT JOIN sys.objects AS SO
+    ON UE.major_id = SO.object_id;]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

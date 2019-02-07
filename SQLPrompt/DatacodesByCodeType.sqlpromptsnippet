@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>DatacodesByCodeType</Title>
+      <Shortcut>DatacodesByCodeType</Shortcut>
+      <Description>Select data codes by CodeType</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>CodeType</ID>
+          <ToolTip />
+          <Default>MemberCommunicationStatus</Default>
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT * 
+FROM dbo.DATACODES AS d
+WHERE CodeType LIKE '%$CodeType$%'
+ORDER BY d.DATACODEID]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

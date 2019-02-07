@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>Cleanup</Title>
+      <Shortcut>Cleanup</Shortcut>
+      <Description>Data Retention Policy Cleanup Template</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[CREATE PROCEDURE DataRetention.uspCleanup<Schema Name, sysname, Dbo><Table Name, sysname, TblTransmissionDetailsAuditData>
+	@pIsInitial INT = 0
+AS
+BEGIN
+	SET XACT_ABORT ON
+	DECLARE @BatchDate DATETIME, @TableName SYSNAME, @SchemaName SYSNAME
+	SET @BatchDate = GETDATE()
+	SET @SchemaName = '<Schema Name, sysname, Dbo>'
+	SET @TableName = '<Table Name, sysname, TblTransmissionDetailsAuditData>'
+	BEGIN TRY
+		BEGIN TRANSACTION
+
+			-- Move Old Data to Quarantine
+			IF  NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[DataRetention].['+ @SchemaName + '_' + @TableName + ']') AND type in (N'U'))
+			BEGIN
+
+				-- Create Empty Retention Table 
+				SELECT TOP(0) t.*, @BatchDate AS QuarantineDate 
+				INTO DataRetention.<Schema Name, sysname, dbo>_<Table Name, sysname, TblTransmissionDetailsAuditData>
+				FROM <Schema Name, sysname, Dbo>.<Table Name, sysname, TblTransmissionDetailsAuditData> t WITH(NOLOCK)	
+				
+			END
+		
+			-- Bulk Load Retention Table
+			IF @pIsInitial = 0
+			INSERT INTO DataRetention.<Schema Name, sysname, dbo>_<Table Name, sysname, TblTransmissionDetailsAuditData> WITH(TABLOCK)
+			SELECT t.*, @BatchDate
+			FROM 
+				<Schema Name, sysname, Dbo>.<Table Name, sysname, TblTransmissionDetailsAuditData> t WITH(NOLOCK)
+			WHERE 
+				DATEDIFF(dd,<Date Filter Column Name, sysname, AuditDateTime>,@BatchDate) > DataRetention.udfGetRetentionDays(@SchemaName, @TableName)
+				
+
+			-- Cleanup Quarantined Data
+			CREATE CLUSTERED INDEX idxTempQuarantine ON DataRetention.<Schema Name, sysname, dbo>_<Table Name, sysname, TblTransmissionDetailsAuditData> (QuarantineDate)
+			DELETE FROM DataRetention.<Schema Name, sysname, dbo>_<Table Name, sysname, TblTransmissionDetailsAuditData> WITH(ROWLOCK)
+			WHERE DATEDIFF(dd,QuarantineDate,@BatchDate) > DataRetention.udfGetQuarantineDays(@SchemaName, @TableName)
+			DROP INDEX idxTempQuarantine ON DataRetention.<Schema Name, sysname, dbo>_<Table Name, sysname, TblTransmissionDetailsAuditData>
+			
+			-- Remove Old Data
+			DELETE t
+			FROM 
+				<Schema Name, sysname, Dbo>.<Table Name, sysname, TblTransmissionDetailsAuditData> t WITH(ROWLOCK)
+			WHERE 
+				DATEDIFF(dd,<Date Filter Column Name, sysname, AuditDateTime>,@BatchDate) > DataRetention.udfGetRetentionDays(@SchemaName, @TableName)
+					
+			COMMIT TRANSACTION
+			
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRANSACTION
+		PRINT '<<<ROLLED BACK>>>'
+		PRINT 'ErrorNumber:' + CONVERT(VARCHAR, ERROR_NUMBER())
+		PRINT 'ErrorSeverity:' + CONVERT(VARCHAR, ERROR_SEVERITY())
+		PRINT 'ErrorState:' + CONVERT(VARCHAR, ERROR_STATE())
+		PRINT 'ErrorProcedure:' + ERROR_PROCEDURE()
+		PRINT 'ErrorLine:' + CONVERT(VARCHAR, ERROR_LINE())
+		PRINT 'ErrorMessage:' + ERROR_MESSAGE()
+	END CATCH
+END
+GO]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

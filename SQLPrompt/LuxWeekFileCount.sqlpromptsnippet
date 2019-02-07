@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>LuxWeekFileCount</Title>
+      <Shortcut>LuxWeekFileCount</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT REPLACE(SUBSTRING(filename,1,LEN(FileName)-27), 'E:\Luxottica\Incoming\','') FileType, DATEPART(wk, FileReceived) AS WeekNumber, COUNT(DISTINCT FileName) FileCount, SUM(TotalRecords) - SUM(ErrorRecords) AS ApproximateRowCount
+FROM luxmdb.staging.controllog
+WHERE REPLACE(SUBSTRING(filename,1,LEN(FileName)-27), 'E:\Luxottica\Incoming\','') != ''
+GROUP BY REPLACE(SUBSTRING(filename,1,LEN(FileName)-27), 'E:\Luxottica\Incoming\',''), DATEPART(wk, FileReceived)
+ORDER BY REPLACE(SUBSTRING(filename,1,LEN(FileName)-27), 'E:\Luxottica\Incoming\',''), DATEPART(wk, FileReceived)
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

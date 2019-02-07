@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>diskUsageFile</Title>
+      <Shortcut>diskUsageFile</Shortcut>
+      <Description>Disk usage per database file</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT f.database_id, database_name = DB_NAME(f.database_id)
+, [file_name] = f.name, f.file_id, f.type_desc, f.state_desc
+, drive = s.volume_mount_point, drive_name = s.logical_volume_name
+, file_path = f.physical_name
+, size_mb = CAST((f.size * 8.0 / 1024) AS decimal(10,2))
+, size_gb = CAST((f.size * 8.0 / 1024 / 1024) AS decimal(7,2))
+, growth = CASE
+            WHEN f.is_percent_growth = 1 
+              THEN CAST(growth AS varchar(3)) + '%'
+            ELSE CAST(growth * 8 / 1024 AS varchar(20)) + ' MB'
+            END
+FROM sys.master_files AS f
+CROSS APPLY sys.dm_os_volume_stats(f.database_id, f.file_id) AS s
+ORDER BY f.database_id, f.[type]]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

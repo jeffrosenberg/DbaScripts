@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>iipk</Title>
+      <Shortcut>iipk</Shortcut>
+      <Description>Int Identity Primary Key Declaration fragment</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[INT IDENTITY(1,1) PRIMARY KEY]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

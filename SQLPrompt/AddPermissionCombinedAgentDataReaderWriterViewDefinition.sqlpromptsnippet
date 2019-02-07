@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AddPermissionCombinedAgentDataReaderWriterViewDefinition</Title>
+      <Shortcut>AddPermissionCombinedAgentDataReaderWriterViewDefinition</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[USE [master]
+GO
+/*
+	In sql mgmt studio, to replace template parameters below (e.g. Database Name):
+	
+	press=>  CTRL+SHIFT+M 
+	OR 
+	click=> Query Menu->Specify Values for Template Parameters
+
+*/
+USE [master]
+GO
+/*
+	In sql mgmt studio, to replace template parameters below (e.g. Database Name):
+	
+	press=>  CTRL+SHIFT+M 
+	OR 
+	click=> Query Menu->Specify Values for Template Parameters
+
+*/
+GRANT EXECUTE ON xp_cmdshell TO [OLSON\HGP_SQL_QA_RW];
+GRANT EXECUTE ON xp_create_subdir TO [OLSON\HGP_SQL_QA_RW];
+
+-- Add SQL Agent Access
+USE [msdb]
+GO
+CREATE USER [<Domain User, SYSNAME, MyDomain\MyUserName>] FOR LOGIN [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+ALTER ROLE [SQLAgentOperatorRole] ADD MEMBER [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+USE [msdb]
+GO
+ALTER ROLE [SQLAgentReaderRole] ADD MEMBER [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+
+-- Add DataReader/DataWriter
+USE <Database Name, SYSNAME, MyDB1>
+GO
+CREATE USER [<Domain User, SYSNAME, MyDomain\MyUserName>] FOR LOGIN [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+ALTER ROLE [db_datareader] ADD MEMBER [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+ALTER ROLE [db_datawriter] ADD MEMBER [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GO
+-- Add Grant View Definition
+GRANT VIEW DEFINITION TO [<Domain User, SYSNAME, MyDomain\MyUserName>]
+GRANT EXECUTE TO [<Domain User, SYSNAME, MyDomain\MyUserName>]]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

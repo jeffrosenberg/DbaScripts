@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>AG_Role</Title>
+      <Shortcut>AG_Role</Shortcut>
+      <Description>Display the current server's role in each availability group</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT [Server] = @@SERVERNAME
+     , [Availability Group] = ag.name
+     , [Role] = s.Role_Desc
+FROM sys.dm_hadr_availability_replica_states s
+INNER JOIN sys.availability_groups AS ag
+  ON ag.group_id = s.group_id
+WHERE s.is_local = 1]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

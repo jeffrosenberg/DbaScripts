@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>iim</Title>
+      <Shortcut>iim</Shortcut>
+      <Description>Template for script to use in creation of MDB Staging Insert to Staging.ImportMetadata</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[	--<Section Name, String, DISCOUNTS>
+		,	
+			(
+			 'Staging.<Tablename, String, Discounts>'
+		   , -- DestinationTable - sysname
+			 1
+		   , -- IsEnabled 
+			 CONVERT(NVARCHAR(32),HashBytes('MD5', N'<File format header, Enter per UC, DOB|UnitID|CheckNum|Type|TypeID|Amount>'),2)
+		   , -- FileFormat - varchar(500)
+			 'TRUNCATE TABLE StagingWIP.<Tablename, String, Discounts>'
+		   , -- SQLTruncate - varchar(500)
+			 'EXEC StagingWIP.UpdateStaging<Tablename, String, Discounts> ?, ?, ?, @BatchLineIncrement = NULL'
+		   , -- SQLUpdate - varchar(500)
+			 '<Tablename, String, Discounts>'
+		   , -- StagingTable - sysname
+			 'StagingWIP'
+		   , -- StagingSchema - sysname
+			 'FileName LIKE ''%.txt'' AND FileName LIKE ''%<Filter Expression, String (see Use Case), -discounts->%'''
+		   , -- FilterExpression - varchar(500)
+			 --'(\d*){10}'
+			 '<File Trailer Regex, See Use Case - Standard Regex to match, (\d*)\|([DPQS])\|([0-9]+(?:\.[0-9]*)?)>'
+		   , -- FileTrailerRegex - varchar(250)
+			 '<Key Positions, See Use Case, 0,1,2,3,4>'
+		   , -- KeyPositions - varchar(500)
+		   'EXEC Staging.InsertControlLogDetail {ControlLog}, {FailureReason}, {BatchLineNumber}, 
+			''<ControlLogDetail xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			  <Row>
+				<REMINDER LINE 1, Reminder string, *************************************************>
+				<REMINDER LINE 2, Reminder string, ** CHANGE FOLLOWING ROWDATA NODES TO MATCH KEY **>
+				<REMINDER LINE 3, Reminder string, *************************************************>
+				<RowData FieldName="DOB" FieldValue="{0}" />
+				<RowData FieldName="UnitID" FieldValue="{1}" />
+				<RowData FieldName="CheckNum" FieldValue="{2}" />
+				<RowData FieldName="Type" FieldValue="{3}" />
+				<RowData FieldName="TypeID" FieldValue="{4}" />
+			  </Row>
+			  </ControlLogDetail>'''
+		   , -- SQLLogDetailErrors - varchar(500)
+			 '-- NOT IN USE'
+		   , -- SQLIndexRebuild - varchar(1000)
+			 1
+		   , -- ExcludeDecryption - bit
+			 NULL  -- ExcludeOutgoingControlFiles - bit
+		   , '<ControlLogDetail xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+			  <Row>
+				<REMINDER LINE 1, Reminder string, *************************************************>
+				<REMINDER LINE 2, Reminder string, ** CHANGE FOLLOWING ROWDATA NODES TO MATCH KEY **>
+				<REMINDER LINE 3, Reminder string, *************************************************>
+				<RowData FieldName="DOB" FieldValue="{0}" />
+				<RowData FieldName="UnitID" FieldValue="{1}" />
+				<RowData FieldName="CheckNum" FieldValue="{2}" />
+				<RowData FieldName="Type" FieldValue="{3}" />
+				<RowData FieldName="TypeID" FieldValue="{4}" />
+			  </Row>
+			  </ControlLogDetail>'  -- SQLLogDetailErrorsSchema - XML
+		   , 1						-- ProcessingTier - int
+		   , NULL						-- ProcessingGroup - int		   /* SET PROGRAMMATICALLY BY ETL */
+		   , '<File Trailer Rule, See Use Case spec, {Count},{Environment}(D),{Total}(5)>'		--FileTrailerRules - varchar(500)
+		   , '<File Expected Time, TIME, 12:00:00.000>'			--FileExpectedTime - TIME
+		   , NULL					--FileExpectedLastNotification - DATETIME
+			)
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

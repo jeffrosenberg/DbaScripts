@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>CheckSplitCount</Title>
+      <Shortcut>CheckSplitCount</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT cntr_value AS TotalSplitCount
+FROM MASTER.dbo.sysperfinfo
+WHERE counter_name ='Page Splits/sec' AND
+OBJECT_NAME LIKE'%Access methods%']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

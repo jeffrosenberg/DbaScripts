@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>lastStartup</Title>
+      <Shortcut>lastStartup</Shortcut>
+      <Description>Shows the startup time for each SQL Server service</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[SELECT servicename, process_id, startup_type_desc, status_desc 
+     , last_startup_time, service_account
+FROM sys.dm_server_services WITH (NOLOCK) OPTION (RECOMPILE);]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

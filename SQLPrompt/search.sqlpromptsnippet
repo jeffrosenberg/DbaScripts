@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>search</Title>
+      <Shortcut>search</Shortcut>
+      <Description>Find object(s) with code containing search text</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations>
+        <Literal>
+          <ID>SearchTerm</ID>
+          <ToolTip />
+          <Default />
+        </Literal>
+      </Declarations>
+      <Code Language="sql"><![CDATA[SELECT obj.object_id, name, [type], type_desc
+, create_date, modify_date
+, definition
+FROM sys.objects AS obj
+LEFT OUTER JOIN sys.sql_modules AS m
+  ON m.object_id = obj.object_id
+WHERE is_ms_shipped = 0
+  AND definition LIKE '%$SearchTerm$%']]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

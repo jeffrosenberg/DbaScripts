@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>generateRestoreStatement</Title>
+      <Shortcut>generateRestoreStatement</Shortcut>
+      <Description>Build a RESTORE DATABASE statement by looking at the file system</Description>
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--EXEC xp_dirtree 'Z:\Backup',5,1
+
+DECLARE @Dir        varchar(255) = 'Z:\Backup\DBNAME'; --If the database name is in the path, 
+DECLARE @Db         varchar(35)  = 'DBNAME'            --include in both @Dir and @Db variables
+DECLARE @BackupType varchar(10)  = 'FULL' -- FULL/DIFF/LOG
+DECLARE @Directory  varchar(300) = @Dir
+DECLARE @Standby    bit          = 0 -- 0 = WITH NORECOVERY; 1 = WITH STANDBY
+
+IF OBJECT_ID(N'tempdb..#Files') IS NOT NULL	DROP TABLE #Files
+CREATE TABLE #Files (
+	subdirectory varchar(1000),
+	depth int,
+	[file] int
+);
+insert into #Files
+exec xp_dirtree @Directory,3,1
+
+DELETE #Files WHERE subdirectory NOT LIKE '%' + @Db + '%';
+DELETE #Files WHERE subdirectory NOT LIKE '%' + @BackupType + '%';
+
+IF @BackupType IN ('FULL','DIFF')
+BEGIN
+  DELETE #Files WHERE subdirectory NOT LIKE '%.bak';
+
+  SELECT RestoreStmt = 'RESTORE FILELISTONLY'
+  UNION ALL
+  SELECT RestoreStmt = '--DATABASE ' + QUOTENAME(@DB)
+  UNION ALL
+  SELECT RestoreStmt = 'FROM'
+  UNION ALL
+	SELECT RestoreStmt = CASE WHEN subdirectory LIKE '%_1.bak' THEN '  '
+                            WHEN subdirectory LIKE '%_[2-9].bak' THEN ', '
+                            ELSE ''
+                            END
+                     + 'DISK = ''' + @Directory + '\' + subdirectory  + '''' 
+  FROM #Files AS f
+  UNION ALL 
+  SELECT RestoreStmt = CASE @Standby WHEN 1 THEN 'WITH STANDBY = ''Z:\Standby\' + @Db + '.bak'''
+                                     ELSE 'WITH NORECOVERY'
+                                     END
+  UNION ALL 
+  SELECT RestoreStmt = ', STATS = 5'
+END
+ELSE IF @BackupType = 'LOG'
+BEGIN
+  DELETE #Files WHERE subdirectory NOT LIKE '%.trn';
+
+  select RestoreStmt = 'RESTORE ' + @BackupType + ' ' + QUOTENAME(@Db) 
+                     + ' FROM DISK = ''' + @Directory + '\' + subdirectory  + ''''
+                     + CASE @Standby WHEN 1 THEN ' WITH STANDBY = ''Z:\Standby\' + @Db + '.bak'''
+                                     ELSE ' WITH NORECOVERY'
+                                     END
+  FROM #Files
+END]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

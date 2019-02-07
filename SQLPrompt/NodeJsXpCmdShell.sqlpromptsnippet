@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>NodeJsXpCmdShell</Title>
+      <Shortcut>NodeJsXpCmdShell</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 7C23862C110A75A3428DD6D4'
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 7C37963E0E7A14C1';
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 732F9836110A6F';
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 6E37812B1919';
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 763B942B087F1EC13095';
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE c5535f5d';		--temp
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 6D30E54E647974A45598';
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 7170c800';		--temp
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 71536fae';		--temp
+--xp_cmdshell 'node C:\Test\testWithArgs.js 3505DFB0017A4CE 6C2B96376B7B15C2';
+
+--EXEC util.NodeARC4Decrypt '3505DFB0017A4CE', '6C2B96376B7B15C2'
+IF OBJECT_ID('util.NodeARC4Decrypt') IS NOT NULL DROP PROCEDURE util.NodeARC4Decrypt 
+GO
+CREATE PROCEDURE util.NodeARC4Decrypt 
+(
+  @EncryptionKey VARCHAR(MAX)
+  , @CipherText VARCHAR(MAX)
+
+)
+AS
+BEGIN
+	DECLARE @T TABLE (Output VARCHAR(MAX))
+	DECLARE @RC VARCHAR(MAX) =''
+		, @stmt VARCHAR(8000) = 'node C:\Test\testWithArgs.js ' + @EncryptionKey + ' ' + @CipherText	--VARCHAR(MAX) not allowed for xp_cmdshell
+	
+	INSERT INTO @T
+	EXEC master..xp_cmdshell @stmt;
+
+	SELECT Output FROM @T WHERE Output IS NOT NULL
+
+END
+GO
+]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>

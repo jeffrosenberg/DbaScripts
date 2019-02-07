@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets>
+  <CodeSnippet Format="1.0.0">
+    <Header>
+      <Title>etlMetaSrc</Title>
+      <Shortcut>etlMetaSrc</Shortcut>
+      <Description />
+      <Author />
+      <SnippetTypes>
+        <SnippetType>Expansion</SnippetType>
+      </SnippetTypes>
+    </Header>
+    <Snippet>
+      <Declarations />
+      <Code Language="sql"><![CDATA[
+INSERT INTO SSIS.EtlMetadataSourceObjects
+        (
+         SourceObject
+       , ProcedureCall
+       , CreateDateTime
+       , UpdateDateTime
+        )
+VALUES  (
+         '<SourceObject, String, Staging.ItemDiscounts><SourceObjectModifier, String .Total|.Frequency, .Total>'
+       , -- SourceObject - varchar(100)
+         'EXEC <GetChanges Proc Name, String, Staging.GetChangesItemDiscounts><GetChangesModifier, String (Total|Frequency), Total> @InitStageKey=1?, @MostRecentOnly=2?'
+       , -- ProcedureCall - varchar(100)
+         GETDATE()
+       , -- CreateDateTime - datetime
+         GETDATE()  -- UpdateDateTime - datetime
+        )]]></Code>
+    </Snippet>
+  </CodeSnippet>
+</CodeSnippets>
