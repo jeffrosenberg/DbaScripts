@@ -1,0 +1,46 @@
+ALTER DATABASE [Db] 
+       SET QUERY_STORE = ON;
+GO
+
+ALTER DATABASE [Db] 
+       SET QUERY_STORE (
+              OPERATION_MODE = READ_WRITE, 
+              /*     
+                     READ_WRITE = data collection (default)
+                     READ_ONLY = no data collection 
+              */
+              CLEANUP_POLICY = (STALE_QUERY_THRESHOLD_DAYS = 30), 
+              /*     
+                     INT data type (default is 30)
+              */
+              DATA_FLUSH_INTERVAL_SECONDS = 900,  
+              /*     
+                     INT data type (default is 900)
+              */
+              INTERVAL_LENGTH_MINUTES = 60,              /*     
+                     (default is 60)
+                     arbitary numbers not allowed
+                     acceptable values are:
+                           1, 5, 10, 15, 30, 60, 1440
+              */
+              MAX_STORAGE_SIZE_MB = 500, -- Suggested change from default (JR)
+              /*     
+                     INT data type (default is 100MB)
+                     When the max is hit, 
+                     status changes to READ_ONLY
+              */
+              QUERY_CAPTURE_MODE = AUTO, --Modified per Solarwinds suggestion
+/* 
+                     are ALL queries captured, or only "relevant" ones? 
+                     ALL = every query executed (default)
+                     AUTO = infrequent & insignificant
+                     NONE = nothing new added
+              */
+              SIZE_BASED_CLEANUP_MODE = AUTO, 
+              /* 
+                     AUTO = query store will go into clean up mode as usage gets 
+                           close to MAX_STORAGE_SIZE_MB (default)
+                     OFF = clean up will not occur
+              */
+              MAX_PLANS_PER_QUERY = 200);
+GO

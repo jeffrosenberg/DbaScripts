@@ -13,4 +13,5 @@ FROM sys.dm_db_missing_index_groups mig
 INNER JOIN sys.dm_db_missing_index_group_stats migs ON migs.group_handle = mig.index_group_handle
 INNER JOIN sys.dm_db_missing_index_details mid ON mig.index_handle = mid.index_handle
 WHERE migs.avg_total_user_cost * (migs.avg_user_impact / 100.0) * (migs.user_seeks + migs.user_scans) > 10
+  --AND PARSENAME(mid.statement, 1) LIKE '%%' -- search by table name
 ORDER BY index_advantage DESC

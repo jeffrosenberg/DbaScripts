@@ -4,7 +4,7 @@
 -- Via: http://dba.stackexchange.com/questions/139191/sql-server-how-to-track-progress-of-create-index-command
 -- 
 
-DECLARE @SPID INT = ?; -- SPID of CREATE INDEX statement
+DECLARE @SPID INT = 406 ; -- SPID of CREATE INDEX statement
 
 ;WITH agg AS
 (

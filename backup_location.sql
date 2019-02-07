@@ -1,0 +1,30 @@
+SELECT 
+  [Database] = bs.database_name
+, [Type] = 
+    CASE bs.[Type]
+      WHEN 'D' THEN 'Full'
+      WHEN 'I' THEN 'Diff'
+      WHEN 'L' THEN 'Log'
+      ELSE bs.[Type]
+      END
+, BackupStartDate = bs.backup_start_date
+, BackupPath = bmf.physical_device_name
+FROM msdb..backupset AS bs
+INNER JOIN msdb..backupmediafamily AS bmf 
+  ON bmf.media_set_id = bs.media_set_id
+INNER JOIN (
+  SELECT [database_name]
+       , [type]
+       , latest_backup = MAX(backup_start_date)
+  FROM msdb..backupset
+  GROUP BY [database_name], [type]
+) AS latest
+  ON latest.[type] = bs.[type]
+    AND latest.[database_name] = bs.[database_name]
+WHERE bs.backup_start_date = latest.latest_backup
+  AND (
+        bmf.physical_device_name LIKE '%[_]1.bak'
+        OR (bmf.physical_device_name LIKE '%.bak' AND bmf.physical_device_name NOT LIKE '%[_][0-9].bak')
+        OR bmf.physical_device_name LIKE '%.trn'
+       )
+ORDER BY bs.database_name, bs.[Type]
