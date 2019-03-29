@@ -19,3 +19,4 @@ RestoreExamples.sql
 
 #Unwanted file types
 *.zip
+.DS_Store
