@@ -34,11 +34,11 @@ declare @now datetimeoffset = sysdatetimeoffset();
 -- Filtering parameters
 --
 -- Modify these to filter the queries and/or stored procedures that are analyzed
-declare @startTime datetimeoffset = datetimeoffsetfromparts(year(@now), month(@now), day(@now), 0, 0, 0, 0, datepart(tzoffset, @now) / 60, 0, 2) /* Today midnight */
---declare @startTime datetimeoffset = cast('2019-07-27 00:00' as datetime) /* Specify time */ at time zone 'Central Standard Time'
+--declare @startTime datetimeoffset = datetimeoffsetfromparts(year(@now), month(@now), day(@now), 0, 0, 0, 0, datepart(tzoffset, @now) / 60, 0, 2) /* Today midnight */
+declare @startTime datetimeoffset = cast('2021-05-05 10:00' as datetime) /* Specify time */ at time zone 'Central Standard Time'
 declare @endTime datetimeoffset = null -- leave null to get up to the present
---declare @endTime datetimeoffset = cast('2019-07-30 00:00' as datetime) /* Specify time */ at time zone 'Central Standard Time'
-declare @containsText nvarchar(4000) = null; -- Search for text in the query
+--declare @endTime datetimeoffset = cast('2021-05-04 11:05' as datetime) /* Specify time */ at time zone 'Central Standard Time'
+declare @containsText nvarchar(4000) ='promotionrule'; -- Search for text in the query
 declare @storedProcedures table ( [object_id] int not null primary key ); -- If desired, add object_id of stored procedures to this list to filter to those procedures
 --insert into @storedProcedures ( [object_id] )
 --values
@@ -50,13 +50,14 @@ declare @storedProcedures table ( [object_id] int not null primary key ); -- If 
 -- Display parameters
 declare @rowsToSelect int = 100;
 declare @orderByExecutionCount bit = 0;
-declare @orderByTotalDuration bit = 1;
+declare @orderByTotalDuration bit = 0;
 declare @orderByTotalLogicalReads bit = 0;
 declare @orderByTotalPhysicalReads bit = 0;
 declare @orderByTotalLogicalWrites bit = 0;
 declare @orderByTotalCpuTime bit = 0;
 declare @orderByTotalRows bit = 0;
-declare @orderByAvgDuration bit = 0;
+declare @orderByAvgExecutions bit = 0;
+declare @orderByAvgDuration bit = 1;
 declare @orderByAvgLogicalReads bit = 0;
 declare @orderByAvgPhysicalReads bit = 0;
 declare @orderByAvgLogicalWrites bit = 0;
@@ -152,7 +153,7 @@ select top (@rowsToSelect)
 , total_duration_s = cast(qs.total_duration_us / @microsecondsPerSecond as decimal(12,2))
 , avg_duration_s = cast((qs.total_duration_us / qs.count_executions_safe) / @microsecondsPerSecond as decimal(12,2))
 --, min_duration_s = cast(qs.min_duration_us / @microsecondsPerSecond as decimal(12,2))
-, min_duration_s = cast(qs.max_duration_us / @microsecondsPerSecond as decimal(12,2))
+, max_duration_s = cast(qs.max_duration_us / @microsecondsPerSecond as decimal(12,2))
 
 -- Reads
 , qs.total_logical_reads
@@ -207,6 +208,12 @@ order by case when @orderByExecutionCount = 1 then qs.count_executions else null
        , case when @orderByTotalLogicalWrites = 1 then qs.total_logical_writes else null end desc
        , case when @orderByTotalCpuTime = 1 then qs.total_cpu_time_us else null end desc
        , case when @orderByTotalRows = 1 then qs.total_rowcount else null end desc
+	   , case when @orderByAvgExecutions = 1 then 
+											 case when qs.count_executions = 0 then 0
+												  when coalesce(datediff(minute, qs.first_execution_time, qs.last_execution_time), 0) = 0 then 0
+												  else cast((qs.count_executions + 0.0) / datediff(minute, qs.first_execution_time, qs.last_execution_time) as numeric(8,2))
+												  end
+											 else null end desc
        , case when @orderByAvgDuration = 1 then (qs.total_duration_us / qs.count_executions_safe) else null end
        , case when @orderByAvgLogicalReads = 1 then (qs.total_logical_reads / qs.count_executions_safe) else null end desc
        , case when @orderByAvgPhysicalReads = 1 then (qs.total_physical_reads / qs.count_executions_safe) else null end desc
